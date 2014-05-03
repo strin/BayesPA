@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/test.dir/src/main.cpp.o  -o test  libbayespa.dylib /opt/local/lib/libboost_filesystem-mt.dylib /opt/local/lib/libboost_system-mt.dylib /opt/local/lib/libboost_date_time-mt.dylib /opt/local/lib/libboost_python-mt.dylib /opt/local/lib/libboost_thread-mt.dylib /opt/local/lib/libpython2.7.dylib 

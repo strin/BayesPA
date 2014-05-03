@@ -1,0 +1,1 @@
+nohup ./pamedlda-ave --multic_topic --test_sample 200 --I 2 --J 1 --c 1 --l 164 --path ../data/ &
