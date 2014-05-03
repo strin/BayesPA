@@ -116,6 +116,7 @@ namespace paMedLDA_averaging {
 		/* result */
 		double test_score;
 		vector<Commit> commit_points;
+		double** zbar;
 		
 		/* source of memory */
 		Array<double> mem_double;

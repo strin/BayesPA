@@ -87,6 +87,28 @@ bp::list paMedLDAaveWrapper::topicMatrix(bp::object category_no) const {
 	return mat;
 }
 
+bp::list paMedLDAaveWrapper::topicDistOfInference(bp::object category_no) const {
+	int ci = bp::extract<int>(category_no);
+	bp::list mat;
+	if(pamedlda[ci]->zbar == NULL) return mat;
+	for(int d = 0; d < this->pamedlda[ci]->test_data->D; d++) {
+		bp::list row;
+		for(int k = 0; k < this->pamedlda[ci]->m_K; k++) {
+			row.append(pamedlda[ci]->zbar[d][k]);
+		}
+		mat.append(row);
+	}
+	return mat;
+}
+
+bp::list paMedLDAaveWrapper::labelOfInference() const {
+	bp::list list;
+	for(int d = 0; d < this->corpus->test_data.D; d++) {
+		list.append(corpus->test_data.doc[d].y[0]);
+	}
+	return list;
+}
+
 BOOST_PYTHON_MODULE(libbayespa)
 {
   using namespace boost::python;
@@ -97,6 +119,8 @@ BOOST_PYTHON_MODULE(libbayespa)
     .def("timeElapsed", &paMedLDAaveWrapper::timeElapsed)
     .def("testAcc", &paMedLDAaveWrapper::testAcc)
     .def("topicMatrix", &paMedLDAaveWrapper::topicMatrix)
+    .def("topicDistOfInference", &paMedLDAaveWrapper::topicDistOfInference)
+    .def("labelOfInference", &paMedLDAaveWrapper::labelOfInference)
     ;
 };
 

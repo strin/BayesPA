@@ -34,6 +34,8 @@ struct paMedLDAaveWrapper {
 	bp::object timeElapsed() const;
 	bp::object testAcc() const {return bp::object(m_test_acc); }
 	bp::list topicMatrix(bp::object category_no) const;
+	bp::list topicDistOfInference(bp::object category_no) const;
+	bp::list labelOfInference() const;
 
 	// boost::python::array getTopWords();
 	vector<shared_ptr<paMedLDAave> > pamedlda;

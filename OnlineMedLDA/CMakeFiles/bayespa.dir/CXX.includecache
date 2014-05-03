@@ -340,6 +340,20 @@ wctype.h
 
 /System/Library/Frameworks/Python.framework/Headers/weakrefobject.h
 
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/Corpus.cpp
+Corpus.h
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/Corpus.h
+
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAave.cpp
+paMedLDAave.h
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAave.h
+utils/utils.h
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/utils.h
+float.h
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/float.h
+thread
+-
+
 /Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAaveWrapper.cpp
 paMedLDAaveWrapper.h
 /Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAaveWrapper.h
