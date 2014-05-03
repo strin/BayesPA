@@ -74,6 +74,18 @@ bp::object paMedLDAaveWrapper::timeElapsed() const {
 	return bp::object(train_time/(double)corpus->newsgroup_n);
 }
 
+bp::list paMedLDAaveWrapper::topicMatrix(bp::object category_no) const {
+	int ci = bp::extract<int>(category_no);
+	bp::list mat;
+	for(int k = 0; k < this->pamedlda[ci]->m_K; k++) {
+		bp::list row;
+		for(int t = 0; t < this->pamedlda[ci]->m_T; t++) {
+			row.append(pamedlda[ci]->global->gamma[k][t]/(double)pamedlda[ci]->global->gammasum[k]);
+		}
+		mat.append(row);
+	}
+	return mat;
+}
 
 BOOST_PYTHON_MODULE(libbayespa)
 {
@@ -84,6 +96,7 @@ BOOST_PYTHON_MODULE(libbayespa)
     .def("infer", &paMedLDAaveWrapper::infer)
     .def("timeElapsed", &paMedLDAaveWrapper::timeElapsed)
     .def("testAcc", &paMedLDAaveWrapper::testAcc)
+    .def("topicMatrix", &paMedLDAaveWrapper::topicMatrix)
     ;
 };
 

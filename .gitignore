@@ -1,4 +1,6 @@
 *.so
 *.tags
 *.DS_Store
+*.cmake
+CMakeFiles
 

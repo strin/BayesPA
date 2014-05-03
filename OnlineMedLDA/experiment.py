@@ -1,4 +1,5 @@
 from libbayespa import *
+import scipy.io as sio
 
 pamedlda = paMedLDAave({"num_topic"			:	20, 
 						"batchsize"			:	1,
@@ -14,4 +15,7 @@ pamedlda = paMedLDAave({"num_topic"			:	20,
 						"epoch"				: 	1})
 pamedlda.train(11269)
 pamedlda.infer(100)
-print pamedlda.testAcc()
+topic = [None]*20
+for ci in range(20):
+	topic[ci] = pamedlda.topicMatrix(ci)
+sio.savemat('topic.mat', {'topic':topic})
