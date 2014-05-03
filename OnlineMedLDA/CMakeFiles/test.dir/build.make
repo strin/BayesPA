@@ -85,8 +85,12 @@ test_EXTERNAL_OBJECTS =
 test: CMakeFiles/test.dir/src/main.cpp.o
 test: CMakeFiles/test.dir/build.make
 test: libbayespa.dylib
-test: /usr/local/lib/libboost_python-mt.dylib
-test: /usr/lib/libpython2.7.dylib
+test: /opt/local/lib/libboost_filesystem-mt.dylib
+test: /opt/local/lib/libboost_system-mt.dylib
+test: /opt/local/lib/libboost_date_time-mt.dylib
+test: /opt/local/lib/libboost_python-mt.dylib
+test: /opt/local/lib/libboost_thread-mt.dylib
+test: /opt/local/lib/libpython2.7.dylib
 test: CMakeFiles/test.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test.dir/link.txt --verbose=$(VERBOSE)

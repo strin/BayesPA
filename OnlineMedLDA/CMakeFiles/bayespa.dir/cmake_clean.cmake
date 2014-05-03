@@ -1,6 +1,7 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/bayespa.dir/src/Corpus.cpp.o"
   "CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o"
+  "CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o"
   "CMakeFiles/bayespa.dir/src/utils/ap.cpp.o"
   "CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o"
   "CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o"

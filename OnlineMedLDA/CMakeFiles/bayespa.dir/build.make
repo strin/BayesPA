@@ -98,9 +98,32 @@ CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o.provides: CMakeFiles/bayespa.dir/sr
 
 CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o.provides.build: CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o
 
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o: CMakeFiles/bayespa.dir/flags.make
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o: src/paMedLDAaveWrapper.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAaveWrapper.cpp"
+
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAaveWrapper.cpp" > CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.i
+
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/paMedLDAaveWrapper.cpp" -o CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.s
+
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.requires:
+.PHONY : CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.requires
+
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.provides: CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.requires
+	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.provides.build
+.PHONY : CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.provides
+
+CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.provides.build: CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o
+
 CMakeFiles/bayespa.dir/src/utils/ap.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/ap.cpp.o: src/utils/ap.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/ap.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/ap.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/ap.cpp"
 
@@ -123,7 +146,7 @@ CMakeFiles/bayespa.dir/src/utils/ap.cpp.o.provides.build: CMakeFiles/bayespa.dir
 
 CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o: src/utils/cholesky.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/cholesky.cpp"
 
@@ -146,7 +169,7 @@ CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o.provides.build: CMakeFiles/bayes
 
 CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o: src/utils/InverseGaussian.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/InverseGaussian.cpp"
 
@@ -169,7 +192,7 @@ CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o.provides.build: CMakeFile
 
 CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o: src/utils/MVGaussian.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_6)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/MVGaussian.cpp"
 
@@ -192,7 +215,7 @@ CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o.provides.build: CMakeFiles/bay
 
 CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o: src/utils/objcokus.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_7)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/objcokus.cpp"
 
@@ -215,7 +238,7 @@ CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o.provides.build: CMakeFiles/bayes
 
 CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o: CMakeFiles/bayespa.dir/flags.make
 CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o: src/utils/spdinverse.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_8)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o -c "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/src/utils/spdinverse.cpp"
 
@@ -240,6 +263,7 @@ CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o.provides.build: CMakeFiles/bay
 bayespa_OBJECTS = \
 "CMakeFiles/bayespa.dir/src/Corpus.cpp.o" \
 "CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o" \
+"CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o" \
 "CMakeFiles/bayespa.dir/src/utils/ap.cpp.o" \
 "CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o" \
 "CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o" \
@@ -252,6 +276,7 @@ bayespa_EXTERNAL_OBJECTS =
 
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/Corpus.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o
+libbayespa.dylib: CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/ap.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o
@@ -259,8 +284,12 @@ libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/MVGaussian.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/objcokus.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/src/utils/spdinverse.cpp.o
 libbayespa.dylib: CMakeFiles/bayespa.dir/build.make
-libbayespa.dylib: /usr/local/lib/libboost_python-mt.dylib
-libbayespa.dylib: /usr/lib/libpython2.7.dylib
+libbayespa.dylib: /opt/local/lib/libboost_filesystem-mt.dylib
+libbayespa.dylib: /opt/local/lib/libboost_system-mt.dylib
+libbayespa.dylib: /opt/local/lib/libboost_date_time-mt.dylib
+libbayespa.dylib: /opt/local/lib/libboost_python-mt.dylib
+libbayespa.dylib: /opt/local/lib/libboost_thread-mt.dylib
+libbayespa.dylib: /opt/local/lib/libpython2.7.dylib
 libbayespa.dylib: CMakeFiles/bayespa.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX shared library libbayespa.dylib"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/bayespa.dir/link.txt --verbose=$(VERBOSE)
@@ -271,6 +300,7 @@ CMakeFiles/bayespa.dir/build: libbayespa.dylib
 
 CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/Corpus.cpp.o.requires
 CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.o.requires
+CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o.requires
 CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/utils/ap.cpp.o.requires
 CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/utils/cholesky.cpp.o.requires
 CMakeFiles/bayespa.dir/requires: CMakeFiles/bayespa.dir/src/utils/InverseGaussian.cpp.o.requires

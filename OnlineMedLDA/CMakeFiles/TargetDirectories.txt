@@ -1,2 +1,2 @@
 /Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles/bayespa.dir
-/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles/test.dir
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles/dep.dir

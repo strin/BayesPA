@@ -5,9 +5,10 @@ include_directories("inc")
 add_subdirectory("src")
 add_subdirectory("src/utils")
 
+set(CMAKE_PREFIX_PATH /opt/local ${CMAKE_PREFIX_PATH}) 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules) 
 
-find_package(Boost COMPONENTS python REQUIRED)
+find_package(Boost COMPONENTS filesystem system date_time python thread REQUIRED)
 message("Include dirs of boost: " ${Boost_INCLUDE_DIRS} )
 message("Libs of boost: " ${Boost_LIBRARIES} )
 
@@ -19,6 +20,7 @@ include_directories(
   "inc"
   "inc/utils"
   ${Boost_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIRS}
 )
 
 message(STATUS ${LIBS})
@@ -36,6 +38,7 @@ ENDIF()
 ADD_LIBRARY(bayespa SHARED
     src/Corpus.cpp
     src/paMedLDAave.cpp
+	  src/paMedLDAaveWrapper.cpp
     src/utils/ap.cpp
     src/utils/cholesky.cpp
     src/utils/InverseGaussian.cpp
@@ -50,11 +53,13 @@ target_link_libraries(bayespa
   ${PYTHON_LIBRARIES}
 )
 
-add_executable(test src/main.cpp)
 
-target_link_libraries(test
-  bayespa
-  ${LIBS}
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
-)
+#target_link_libraries(test
+#  bayespa
+#  ${LIBS}
+#  ${Boost_LIBRARIES}
+#  ${PYTHON_LIBRARIES}
+#)
+
+
+add_custom_target(dep ALL COMMAND mv libbayespa.dylib libbayespa.so )

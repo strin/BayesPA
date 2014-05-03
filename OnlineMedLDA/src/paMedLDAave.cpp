@@ -156,7 +156,6 @@ paMedLDAave::paMedLDAave(Corpus* corpus, int m_category) {
 	m_Jburnin							= 0;					// inter burnin.
 	m_l									= 164;					// margin control.
 	m_c									= 1;					// reguarlization control.
-	burnin_test							= 50;					// test sampling burnin.
 	m_dual_steps						= 10;					// number of dual steps (for m_batchsize > 1).
 	alpha								= 1/(double)m_K;  		// prior of document topic distribution.
 	beta								= 0.5;			  		// prior of dictionary.
@@ -173,17 +172,26 @@ paMedLDAave::paMedLDAave(Corpus* corpus, int m_category) {
 
 void paMedLDAave::init() {
 	/* sampling setting */
-	if(lets_commit) {
-		burnin	= int(commit_points_index[commit_points_index.size()-1]/m_batchsize+1);
-	}else{
-		burnin	= int(m_epoch*train_data->D/m_batchsize+1);
-	}
-	burnin_test	= samplen_test*2;
 	m_v2 = m_v*m_v;
 	/* init stats */
 	global = new GlobalSample(this);
 	local_train = new LocalSample(this, train_data);
 	local_test = new LocalSample(this, test_data);
+	/* Initialization */
+	for( int d = 0; d < train_data->D; d++) {
+		memset(local_train->Cdk[d], 0, sizeof(double)*m_K);
+		for( int i = 0; i < train_data->doc[d].nd; i++) {
+			local_train->Z[d][i] = cokus.randomMT()%m_K;
+			local_train->Cdk[d][local_train->Z[d][i]]++;
+		}
+	}
+	memset(global->gammasum, 0, sizeof(double)*m_K);
+	for( int k = 0; k < m_K; k++) {
+		memset(global->stat_gamma[k], 0, sizeof(double)*m_T);
+		memset(global->gamma[k], 0, sizeof(double)*m_T);
+	}
+	idx = 0;
+	train_time = 0;
 }
 
 paMedLDAave::~paMedLDAave() {
@@ -313,24 +321,6 @@ void paMedLDAave::updateWeight(vector<int>& index, int N, bool remove) {
 			}
 		}
 	}
-	/*else if(mode == REGRESSION){
-		/// deprecated.
-		predict = dotprod(local_train->Zbar[d], global->weight_mean[0], m_K)+global->bias[0];
-		ell = predict-data->doc[d].y[0];
-		if(ell <= 0-m_l)
-			local_train->tau[d][0] = min(m_c, 0-(ell+m_l)
-									/(1+dotprod(local_train->Zbar[d],local_train->Zbar[d], m_K)));
-		else if(ell >= m_l) {
-			local_train->tau[d][0] = max(0-m_c, 0-(ell-m_l)
-									/(1+dotprod(local_train->Zbar[d],local_train->Zbar[d], m_K)));
-		}else{
-			local_train->tau[d][0] = 0;
-		}
-	}*/
-//	for(int k = 0; k < m_K; k++) {
-//		printf("%lf ", global->weight_mean[0][k]);
-//	}
-//	printf("\n");
 }
 
 void paMedLDAave::inferGamma(vector<int>& index, bool reset) {
@@ -397,8 +387,6 @@ void paMedLDAave::updateZTest(int d, double& lhood, objcokus& cokus) {
 		local_test->Cdk[d][zk]--;
 		lhood -= log((beta+global->gamma[zk][t])
 								/(beta*m_T+global->gammasum[zk]));
-		// local_test->Ckt_test[zk][t]--;
-		// Ckt_test_sum[zk]--;
 		double cum = 0;
 		for(int k = 0; k < m_K; k++) {
 			weights[k] = cum+(alpha+local_test->Cdk[d][k])
@@ -412,38 +400,16 @@ void paMedLDAave::updateZTest(int d, double& lhood, objcokus& cokus) {
 		local_test->Cdk[d][seli]++; 
 		lhood += log((beta+global->gamma[seli][t])
 								/(beta*m_T+global->gammasum[seli]));
-		// local_test->Ckt_test[seli][t]++;
-		// Ckt_test_sum[seli]++;
 	}
 }
 
 
 
-double paMedLDAave::train() {
+double paMedLDAave::train(int num_iter) {
 	bool lets_timing = false;
-	
 	clock_t time_start = clock();
-	clock_t time_end;
-	clock_t ta, tb;
-	train_time = 0;
-	Commit commit_point;
-
-	/* Initialization */
-	for( int d = 0; d < train_data->D; d++) {
-		memset(local_train->Cdk[d], 0, sizeof(double)*m_K);
-		for( int i = 0; i < train_data->doc[d].nd; i++) {
-			local_train->Z[d][i] = cokus.randomMT()%m_K;
-			local_train->Cdk[d][local_train->Z[d][i]]++;
-		}
-	}
-	memset(global->gammasum, 0, sizeof(double)*m_K);
-	for( int k = 0; k < m_K; k++) {
-		memset(global->stat_gamma[k], 0, sizeof(double)*m_T);
-		memset(global->gamma[k], 0, sizeof(double)*m_T);
-	}
 	/* Training */
-	int idx = 0, commit_point_i = 0; // index of batch.
-	for(int iter = 0; iter <= burnin; iter++, idx+=m_batchsize) {
+	for(int iter = 0; iter < num_iter; iter++, idx+=m_batchsize) {
 		if(corpus->multi_label && iter%1000 == 0)
 			printf("iter = %d K\n", iter/1000);
 		/* training */
@@ -455,69 +421,29 @@ double paMedLDAave::train() {
 			local_train->active_label[d].clear();
 		for(int si = 0; si < m_I; si++) {
 			for( int sj = 0; sj < m_J; sj++) {
-				if(lets_timing) ta = clock();
 				updateZ(index);					// Update latent assignments.
-				if(lets_timing) {tb = clock(); printf("update z %lf\n", (tb-ta)/(double)CLOCKS_PER_SEC);}
 				if(sj < m_Jburnin) continue;
-				if(lets_timing) ta = clock();
 				inferGamma(index, sj==m_Jburnin);	// Update local stats.
-				if(lets_timing) { tb = clock(); printf("infer Gamma %lf\n", (tb-ta)/(double)CLOCKS_PER_SEC);}
 			}
-			if(lets_timing) ta = clock();
 			normGamma(m_J-m_Jburnin, si>0);		// Normalize local stats.
-			if(lets_timing) {tb = clock(); printf("norm Gamma %lf\n",(tb-ta)/(double)CLOCKS_PER_SEC);}
-			if(lets_timing) ta = clock();
 			updateWeight(index, m_J-m_Jburnin, si>0);	// Update weight.
-			if(lets_timing) { tb = clock(); printf("weight %lf\n",(tb-ta)/(double)CLOCKS_PER_SEC);}
-		}
-		// if(lets_train_acc) {
-		// 	int acc = 0;
-		// 	for(int dd = 0; dd <= iter; dd++) {
-		// 		int d = dd%train_data->D;
-		// 		double disc = discriminant(global->weight_mean[0], local_train->Zbar[d], train_data->doc[d].nd);
-		// 		if(disc*GEN_BIN_LABEL(train_data->doc[d].y[0], m_category) > 0) acc++;
-		// 	}
-		// 	printf("training accuracy = %lf\n", (acc)/(double)(1+iter));
-		// }
-		// /* commit if necessary */
-		if( lets_commit == true && idx >= commit_points_index[commit_point_i]) {
-			commit_point_i++;	
-			time_end = clock();
-			train_time += (double)(time_end-time_start)/CLOCKS_PER_SEC;
-			commit_point.time = train_time;
-			commit_point.accuracy = inference(test_data);
-			commit_point.ob_percent = (double)idx/(double)train_data->D;
-			printf( "commit point #%d, time = %lf, accuracy = %lf, ob_percent = %lf\n", commit_point_i, commit_point.time, commit_point.accuracy, commit_point.ob_percent);
-			fflush(stdout);
-			if(lets_multic == true) {
-				commit_point.my = new double[test_data->D];
-				for( int d = 0; d < test_data->D; d++) commit_point.my[d] = local_test->my[d][0];
-			}
-			commit_points.push_back(commit_point);
-			time_start = clock();
 		}
 	}
 	/* clean */
-	time_end = clock();
+	clock_t time_end = clock();
 	train_time += (double)(time_end-time_start)/CLOCKS_PER_SEC;
-	printf( "training_complete: time = %lf, burnin = %d\n", train_time, burnin);
 	return train_time;
 }
 
-double paMedLDAave::inference(CorpusData* testData) {
+double paMedLDAave::inference(CorpusData* testData, int num_test_sample) {
 	/* init */
 	double** zbar = Array<double>::create_2d(test_data->D, m_K);
-	// memset(local_test->Ckt_sum, 0, sizeof(double)*m_K);
-	// for(int k = 0; k < m_K; k++)
-	// 	memset(local_test->Ckt[k], 0, sizeof(double)*m_T);
 	for(int d = 0; d < testData->D; d++) {
 		memset(local_test->Z[d], 0, sizeof(int)*test_data->doc[d].nd);
 		memset(local_test->Cdk[d], 0, sizeof(double)*m_K);
 		for( int i = 0; i < test_data->doc[d].nd; i++) {
 			local_test->Z[d][i] = cokus.randomMT()%m_K;
 			local_test->Cdk[d][local_test->Z[d][i]]++;
-			// local_test->Ckt[local_test->Z[d][i]][testData->doc[d].words[i]]++;
-			// local_test->Ckt_sum[local_test->Z[d][i]]++;
 		}
 	}
 	/* inference */
@@ -534,7 +460,7 @@ double paMedLDAave::inference(CorpusData* testData) {
 			for(int d = id; d < test_data->D; d += working_thread_n) {
 				/* sample */
 				double lhood = 0, lhood_prev = 0;
-				for(int iter = 0; iter < burnin_test; iter++) {
+				for(int iter = 0; iter < num_test_sample*2; iter++) {
 					updateZTest(d, lhood, cokus);
 					/* compute likelihood */
 					double lhood_now = lhood;
@@ -544,14 +470,14 @@ double paMedLDAave::inference(CorpusData* testData) {
 						break;
 					lhood_prev = lhood_now;
 				}
-				for(int iter = 0; iter < samplen_test; iter++) {
+				for(int iter = 0; iter < num_test_sample; iter++) {
 					updateZTest(d, lhood, cokus);
 					for(int k = 0; k < m_K; k++) {
 						zbar[d][k] += local_test->Cdk[d][k];
 					}
 				}
 				for(int k = 0; k < m_K; k++)
-					zbar[d][k] /= (double)samplen_test;
+					zbar[d][k] /= (double)num_test_sample;
 			}		
 		}, ti);
 	}
@@ -570,7 +496,6 @@ double paMedLDAave::inference(CorpusData* testData) {
 				if(doc.y[li] == 1) pos++;
 				if(disc*GEN_BIN_LABEL(doc.y[li], m_category) >= 0) acc++;
 				if(disc >= 0 && doc.y[li] == 1) truepos++;
-//				printf("m_category py %lf predict %lf y %lf label %d\n", local_test->py[d][li], disc*GEN_BIN_LABEL(doc.y[li], m_category), doc.y[li], (int)GEN_BIN_LABEL(doc.y[li], m_category));
 			}
 		}
 		printf("precision = %lf, recall = %lf\n", truepos/trues, truepos/pos);
@@ -590,7 +515,6 @@ double paMedLDAave::inference(CorpusData* testData) {
 				Document& doc = test_data->doc[d];
 				local_test->py[d][li] = dotprod(zbar[d], global->weight_mean[li], m_K)/doc.nd
 													+(lets_bias)*global->bias[0];
-	//			printf("py = %lf, y = %lf\n", local_test->py[d], doc.y[0]);
 				err += pow(local_test->py[d][li]-doc.y[li], 2);
 				var += pow(doc.y[li]-meany, 2);
 			}

@@ -89,10 +89,9 @@ namespace paMedLDA_averaging {
 
 		/* train and inference */
 		void init();
-		double train();
-		double inference( CorpusData* testData);
-		
-		
+		double train(int num_iter);
+		double inference( CorpusData* testData, int num_test_sample);
+
 		/* auxiliary functions */
 		void computeTheta(CorpusData* data, LocalSample* stats, int d, double* theta);
 		
@@ -101,11 +100,11 @@ namespace paMedLDA_averaging {
 		double alpha, beta, train_time;
 		double m_c, m_l, m_v, m_v2;
 		Corpus* corpus;
-		int burnin, burnin_test, samplen_test;
 		int m_epoch, m_batchsize, m_dual_steps;
 		bool lets_batch, lets_multic, lets_commit, lets_bias;
 		vector<int> commit_points_index;
 		PAmode mode; 
+		int idx;
 
 		/* data */
 		CorpusData *train_data, *test_data;

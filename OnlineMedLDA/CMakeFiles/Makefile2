@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code rel
 CMakeFiles/bayespa.dir/all:
 	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/depend
 	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles"  1 2 3 4 5 6 7 8
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles"  1 2 3 4 5 6 7 8 9
 	@echo "Built target bayespa"
 .PHONY : CMakeFiles/bayespa.dir/all
 
@@ -72,7 +72,7 @@ all: CMakeFiles/bayespa.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/bayespa.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 8
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 9
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/bayespa.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 0
 .PHONY : CMakeFiles/bayespa.dir/rule
@@ -91,38 +91,38 @@ clean: CMakeFiles/bayespa.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/test.dir
+# Target rules for target CMakeFiles/dep.dir
 
 # All Build rule for target.
-CMakeFiles/test.dir/all: CMakeFiles/bayespa.dir/all
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles"  9
-	@echo "Built target test"
-.PHONY : CMakeFiles/test.dir/all
+CMakeFiles/dep.dir/all:
+	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/depend
+	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 
+	@echo "Built target dep"
+.PHONY : CMakeFiles/dep.dir/all
 
 # Include target in all.
-all: CMakeFiles/test.dir/all
+all: CMakeFiles/dep.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/test.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 9
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/test.dir/all
+CMakeFiles/dep.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 0
-.PHONY : CMakeFiles/test.dir/rule
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dep.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles" 0
+.PHONY : CMakeFiles/dep.dir/rule
 
 # Convenience name for target.
-test: CMakeFiles/test.dir/rule
-.PHONY : test
+dep: CMakeFiles/dep.dir/rule
+.PHONY : dep
 
 # clean rule for target.
-CMakeFiles/test.dir/clean:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/clean
-.PHONY : CMakeFiles/test.dir/clean
+CMakeFiles/dep.dir/clean:
+	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/clean
+.PHONY : CMakeFiles/dep.dir/clean
 
 # clean rule for target.
-clean: CMakeFiles/test.dir/clean
+clean: CMakeFiles/dep.dir/clean
 .PHONY : clean
 
 #=============================================================================

@@ -115,17 +115,17 @@ bayespa/fast:
 .PHONY : bayespa/fast
 
 #=============================================================================
-# Target rules for targets named test
+# Target rules for targets named dep
 
 # Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test
-.PHONY : test
+dep: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dep
+.PHONY : dep
 
 # fast build rule for target.
-test/fast:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
+dep/fast:
+	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
+.PHONY : dep/fast
 
 src/Corpus.o: src/Corpus.cpp.o
 .PHONY : src/Corpus.o
@@ -151,30 +151,6 @@ src/Corpus.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/Corpus.cpp.s
 .PHONY : src/Corpus.cpp.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
-
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
-
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
-
 src/paMedLDAave.o: src/paMedLDAave.cpp.o
 .PHONY : src/paMedLDAave.o
 
@@ -198,6 +174,30 @@ src/paMedLDAave.s: src/paMedLDAave.cpp.s
 src/paMedLDAave.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/paMedLDAave.cpp.s
 .PHONY : src/paMedLDAave.cpp.s
+
+src/paMedLDAaveWrapper.o: src/paMedLDAaveWrapper.cpp.o
+.PHONY : src/paMedLDAaveWrapper.o
+
+# target to build an object file
+src/paMedLDAaveWrapper.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.o
+.PHONY : src/paMedLDAaveWrapper.cpp.o
+
+src/paMedLDAaveWrapper.i: src/paMedLDAaveWrapper.cpp.i
+.PHONY : src/paMedLDAaveWrapper.i
+
+# target to preprocess a source file
+src/paMedLDAaveWrapper.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.i
+.PHONY : src/paMedLDAaveWrapper.cpp.i
+
+src/paMedLDAaveWrapper.s: src/paMedLDAaveWrapper.cpp.s
+.PHONY : src/paMedLDAaveWrapper.s
+
+# target to generate assembly for a file
+src/paMedLDAaveWrapper.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespa.dir/build.make CMakeFiles/bayespa.dir/src/paMedLDAaveWrapper.cpp.s
+.PHONY : src/paMedLDAaveWrapper.cpp.s
 
 src/utils/InverseGaussian.o: src/utils/InverseGaussian.cpp.o
 .PHONY : src/utils/InverseGaussian.o
@@ -350,18 +350,18 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... bayespa"
+	@echo "... dep"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test"
 	@echo "... src/Corpus.o"
 	@echo "... src/Corpus.i"
 	@echo "... src/Corpus.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
 	@echo "... src/paMedLDAave.o"
 	@echo "... src/paMedLDAave.i"
 	@echo "... src/paMedLDAave.s"
+	@echo "... src/paMedLDAaveWrapper.o"
+	@echo "... src/paMedLDAaveWrapper.i"
+	@echo "... src/paMedLDAaveWrapper.s"
 	@echo "... src/utils/InverseGaussian.o"
 	@echo "... src/utils/InverseGaussian.i"
 	@echo "... src/utils/InverseGaussian.s"

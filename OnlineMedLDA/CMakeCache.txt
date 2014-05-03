@@ -20,20 +20,44 @@ BayesPA_BINARY_DIR:STATIC=/Volumes/Universe/Research/Machine Learning/BayesPA/co
 //Value Computed by CMake
 BayesPA_SOURCE_DIR:STATIC=/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA
 
+//Boost date_time library (debug)
+Boost_DATE_TIME_LIBRARY_DEBUG:FILEPATH=/opt/local/lib/libboost_date_time-mt.dylib
+
+//Boost date_time library (release)
+Boost_DATE_TIME_LIBRARY_RELEASE:FILEPATH=/opt/local/lib/libboost_date_time-mt.dylib
+
 //The directory containing a CMake configuration file for Boost.
 Boost_DIR:PATH=Boost_DIR-NOTFOUND
 
+//Boost filesystem library (debug)
+Boost_FILESYSTEM_LIBRARY_DEBUG:FILEPATH=/opt/local/lib/libboost_filesystem-mt.dylib
+
+//Boost filesystem library (release)
+Boost_FILESYSTEM_LIBRARY_RELEASE:FILEPATH=/opt/local/lib/libboost_filesystem-mt.dylib
+
 //Path to a file.
-Boost_INCLUDE_DIR:PATH=/usr/local/include
+Boost_INCLUDE_DIR:PATH=/opt/local/include
 
 //Boost library directory
-Boost_LIBRARY_DIR:PATH=/usr/local/lib
+Boost_LIBRARY_DIR:PATH=/opt/local/lib
 
 //Boost python library (debug)
-Boost_PYTHON_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libboost_python-mt.dylib
+Boost_PYTHON_LIBRARY_DEBUG:FILEPATH=/opt/local/lib/libboost_python-mt.dylib
 
 //Boost python library (release)
-Boost_PYTHON_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libboost_python-mt.dylib
+Boost_PYTHON_LIBRARY_RELEASE:FILEPATH=/opt/local/lib/libboost_python-mt.dylib
+
+//Boost system library (debug)
+Boost_SYSTEM_LIBRARY_DEBUG:FILEPATH=/opt/local/lib/libboost_system-mt.dylib
+
+//Boost system library (release)
+Boost_SYSTEM_LIBRARY_RELEASE:FILEPATH=/opt/local/lib/libboost_system-mt.dylib
+
+//Boost thread library (debug)
+Boost_THREAD_LIBRARY_DEBUG:FILEPATH=/opt/local/lib/libboost_thread-mt.dylib
+
+//Boost thread library (release)
+Boost_THREAD_LIBRARY_RELEASE:FILEPATH=/opt/local/lib/libboost_thread-mt.dylib
 
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
@@ -209,27 +233,29 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Headers
 
 //Path to a library.
-PYTHON_LIBRARY:FILEPATH=/usr/lib/libpython2.7.dylib
+PYTHON_LIBRARY:FILEPATH=/opt/local/lib/libpython2.7.dylib
 
 //Path to a library.
 PYTHON_LIBRARY_DEBUG:FILEPATH=PYTHON_LIBRARY_DEBUG-NOTFOUND
 
-//Value Computed by CMake
-Venture_BINARY_DIR:STATIC=/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA
-
-//Value Computed by CMake
-Venture_SOURCE_DIR:STATIC=/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA
-
 //Dependencies for the target
-bayespa_LIB_DEPENDS:STATIC=general;/usr/local/lib/libboost_python-mt.dylib;general;/usr/lib/libpython2.7.dylib;
+bayespa_LIB_DEPENDS:STATIC=general;/opt/local/lib/libboost_filesystem-mt.dylib;general;/opt/local/lib/libboost_system-mt.dylib;general;/opt/local/lib/libboost_date_time-mt.dylib;general;/opt/local/lib/libboost_python-mt.dylib;general;/opt/local/lib/libboost_thread-mt.dylib;general;/opt/local/lib/libpython2.7.dylib;
 
 
 ########################
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: Boost_DATE_TIME_LIBRARY_DEBUG
+Boost_DATE_TIME_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_DATE_TIME_LIBRARY_RELEASE
+Boost_DATE_TIME_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_DIR
 Boost_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_FILESYSTEM_LIBRARY_DEBUG
+Boost_FILESYSTEM_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_FILESYSTEM_LIBRARY_RELEASE
+Boost_FILESYSTEM_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_INCLUDE_DIR
 Boost_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_LIBRARY_DIR
@@ -238,6 +264,14 @@ Boost_LIBRARY_DIR-ADVANCED:INTERNAL=1
 Boost_PYTHON_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_PYTHON_LIBRARY_RELEASE
 Boost_PYTHON_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_SYSTEM_LIBRARY_DEBUG
+Boost_SYSTEM_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_SYSTEM_LIBRARY_RELEASE
+Boost_SYSTEM_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_THREAD_LIBRARY_DEBUG
+Boost_THREAD_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_THREAD_LIBRARY_RELEASE
+Boost_THREAD_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_BUILD_TOOL
@@ -368,7 +402,7 @@ CMAKE_USE_RELATIVE_PATHS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding PythonLibs
-FIND_PACKAGE_MESSAGE_DETAILS_PythonLibs:INTERNAL=[/usr/lib/libpython2.7.dylib][/System/Library/Frameworks/Python.framework/Headers][v2.7.5()]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonLibs:INTERNAL=[/opt/local/lib/libpython2.7.dylib][/System/Library/Frameworks/Python.framework/Headers][v2.7.5()]
 //ADVANCED property for variable: PYTHON_INCLUDE_DIR
 PYTHON_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PYTHON_LIBRARY
@@ -376,11 +410,11 @@ PYTHON_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PYTHON_LIBRARY_DEBUG
 PYTHON_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //Components requested for this build tree.
-_Boost_COMPONENTS_SEARCHED:INTERNAL=python
+_Boost_COMPONENTS_SEARCHED:INTERNAL=date_time;filesystem;python;system;thread
 //Last used Boost_INCLUDE_DIR value.
-_Boost_INCLUDE_DIR_LAST:INTERNAL=/usr/local/include
+_Boost_INCLUDE_DIR_LAST:INTERNAL=/opt/local/include
 //Last used Boost_LIBRARY_DIR value.
-_Boost_LIBRARY_DIR_LAST:INTERNAL=/usr/local/lib
+_Boost_LIBRARY_DIR_LAST:INTERNAL=/opt/local/lib
 //Last used Boost_USE_MULTITHREADED value.
 _Boost_USE_MULTITHREADED_LAST:INTERNAL=TRUE
 
