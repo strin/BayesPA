@@ -12,7 +12,7 @@
 #include <thread>
 #include <cmath>
 
-#include "utils/Debug.h" 
+#include "utils/debug.h" 
 #include "paMedLDAave.h"
 
 using std::shared_ptr;

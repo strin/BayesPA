@@ -27,7 +27,7 @@ message(STATUS ${LIBS})
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   message("Found g++ version " ${CMAKE_CXX_COMPILER_VERSION})
-  ADD_DEFINITIONS("-std=c++11" "-Wall" "-g" "-O0" "-fPIC")
+  ADD_DEFINITIONS("-std=c++11" "-g" "-O3" "-fPIC" "-Wno-deprecated-register" "-Wno-overloaded-virtual" "-Wno-write-strings")
 ELSE("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   message("Found clang++ version" ${CMAKE_CXX_COMPILER_VERSION})
   ADD_DEFINITIONS("-std=c++11" "-g" "-O3" "-fPIC" "-Wno-deprecated-register" "-Wno-overloaded-virtual" "-Wno-write-strings")
