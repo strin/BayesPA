@@ -6,6 +6,16 @@
 
 #IncludeRegexTransform: 
 
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/paMedLDAave.cpp
+paMedLDAave.h
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/paMedLDAave.h
+utils/utils.h
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/utils/utils.h
+float.h
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/float.h
+thread
+-
+
 /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/paMedLDAaveWrapper.cpp
 paMedLDAaveWrapper.h
 /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/src/paMedLDAaveWrapper.h

@@ -437,7 +437,11 @@ double paMedLDAave::train(int num_iter) {
 
 double paMedLDAave::inference(CorpusData* testData, int num_test_sample) {
 	/* init */
-	double** zbar = Array<double>::create_2d(test_data->D, m_K);
+	if(zbar) {
+		Array<double>::del_2d(zbar, test_data->D);
+		zbar = NULL;
+	}
+	zbar = Array<double>::create_2d(test_data->D, m_K);
 	for(int d = 0; d < testData->D; d++) {
 		memset(local_test->Z[d], 0, sizeof(int)*test_data->doc[d].nd);
 		memset(local_test->Cdk[d], 0, sizeof(double)*m_K);
@@ -498,10 +502,10 @@ double paMedLDAave::inference(CorpusData* testData, int num_test_sample) {
 				if(disc >= 0 && doc.y[li] == 1) truepos++;
 			}
 		}
-		printf("precision = %lf, recall = %lf\n", truepos/trues, truepos/pos);
-		if(corpus->multi_label)			// multitask setting: F1 score.
+		if(corpus->multi_label)	{		// multitask setting: F1 score.
+			printf("precision = %lf, recall = %lf\n", truepos/trues, truepos/pos);
 			test_score = 2/(trues/truepos+pos/truepos);
-		else							// else: accuracy.
+		}else							// else: accuracy.
 			test_score = acc/(double)test_data->D;
 	}else if(mode == REGRESSION) {
 		double meany = 0;
@@ -521,7 +525,6 @@ double paMedLDAave::inference(CorpusData* testData, int num_test_sample) {
 		}
 		test_score = 1-err/var;
 	}
-	Array<double>::del_2d(zbar, test_data->D);
 	return test_score;
 }
 
