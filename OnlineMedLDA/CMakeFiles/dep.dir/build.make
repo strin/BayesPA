@@ -26,22 +26,16 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /opt/local/bin/cmake -E remove -f
-
-# Escaping for special characters.
-EQUALS = =
-
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
+RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA"
+CMAKE_SOURCE_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA"
+CMAKE_BINARY_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA
 
 # Utility rule file for dep.
 
@@ -64,6 +58,6 @@ CMakeFiles/dep.dir/clean:
 .PHONY : CMakeFiles/dep.dir/clean
 
 CMakeFiles/dep.dir/depend:
-	cd "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA" "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA" "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA" "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA" "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineMedLDA/CMakeFiles/dep.dir/DependInfo.cmake" --color=$(COLOR)
+	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/CMakeFiles/dep.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/dep.dir/depend
 

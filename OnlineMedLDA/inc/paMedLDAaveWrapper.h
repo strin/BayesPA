@@ -30,7 +30,7 @@ struct sortable {
     double value;
     int index;
     bool operator < (const struct sortable& x) const {
-        return value < x.value;
+        return value > x.value;
     }
 };
 

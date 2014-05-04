@@ -36,14 +36,14 @@ def visualize_topic(category_i):
 	dic = file(config['dic_file']).readlines()
 	num_iter = 11269
 	num_category = 20
-	# periods = [1,16,256,4096,11269]
-	periods = [1]
+	periods = [1,16,256,4096,11269]
 	label = pamedlda.labelOfInference()
 	dist_all = list()
 	topwords_all = list()
 	for period in periods:
+		print 'period = ', period
 		pamedlda.train(int(period))
-		pamedlda.infer(1)
+		pamedlda.infer(100)
 		print 'test acc = ', pamedlda.testAcc()
 		mat = np.array(pamedlda.topicDistOfInference(category_i))
 		topwords = np.array(pamedlda.topWords(category_i, 10))
@@ -56,7 +56,6 @@ def visualize_topic(category_i):
 				topwords_list.append(row)
 			return topwords_list
 		topwords = ind2words(topwords, dic)
-		print topwords
 		count = np.array([0]*20)
 		dist = np.zeros((num_category, m_K))
 		for ni in range(len(label)):
@@ -71,10 +70,16 @@ def visualize_topic(category_i):
 		# print dist
 		dist_all.append(dist[ci])
 		topwords_all.append(topwords)
-	sio.savemat('%s/visualize_topic'%(dir_name), {'dist':dist_all, 'topwords':topwords_all})
+	sio.savemat('%s/visualize_topic'%(dir_name), {'dist':dist_all})
+	topwords_output = open('%s/topwords.txt'%(dir_name), 'w')
+	for topwords in topwords_all:
+		for row in topwords:
+			topwords_output.write(' & '.join(row)+'\n')
+		topwords_output.write('\n\n')
+	topwords_output.close()
 
 if __name__ == '__main__':
-	visualize_topic(0)
+	visualize_topic(1)
 	# acc_test()
 
 
