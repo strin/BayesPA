@@ -87,6 +87,27 @@ bp::list paMedLDAaveWrapper::topicMatrix(bp::object category_no) const {
 	return mat;
 }
 
+bp::list paMedLDAaveWrapper::topWords(bp::object category_no, int topk) const {
+	int ci = bp::extract<int>(category_no);
+	bp::list mat;
+	for(int k = 0; k < this->pamedlda[ci]->m_K; k++) {
+		vector<sortable> v;
+		for(int t = 0; t < this->pamedlda[ci]->m_T; t++) {
+			sortable x;
+			x.value = pamedlda[ci]->global->gamma[k][t]/(double)pamedlda[ci]->global->gammasum[k];
+			x.index = t;
+			v.push_back(x);
+		}
+		sort(v.begin(), v.end());
+		bp::list row;
+		for(int i = 0; i < topk; i++) {
+			row.append(v[i].index);
+		}
+		mat.append(row);
+	}
+	return mat;	
+}
+
 bp::list paMedLDAaveWrapper::topicDistOfInference(bp::object category_no) const {
 	int ci = bp::extract<int>(category_no);
 	bp::list mat;
@@ -121,6 +142,7 @@ BOOST_PYTHON_MODULE(libbayespa)
     .def("topicMatrix", &paMedLDAaveWrapper::topicMatrix)
     .def("topicDistOfInference", &paMedLDAaveWrapper::topicDistOfInference)
     .def("labelOfInference", &paMedLDAaveWrapper::labelOfInference)
+    .def("topWords", &paMedLDAaveWrapper::topWords)
     ;
 };
 

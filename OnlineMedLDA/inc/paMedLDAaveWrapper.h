@@ -11,6 +11,7 @@
 #include <vector>
 #include <thread>
 #include <cmath>
+#include <algorithm>
 
 #include "utils/Debug.h" 
 #include "paMedLDAave.h"
@@ -25,6 +26,14 @@ using paMedLDA_averaging::paMedLDAave;
 
 namespace bp = boost::python;
 
+struct sortable {
+    double value;
+    int index;
+    bool operator < (const struct sortable& x) const {
+        return value < x.value;
+    }
+};
+
 struct paMedLDAaveWrapper {
 	paMedLDAaveWrapper(boost::python::dict config);
 	~paMedLDAaveWrapper();
@@ -34,6 +43,7 @@ struct paMedLDAaveWrapper {
 	bp::object timeElapsed() const;
 	bp::object testAcc() const {return bp::object(m_test_acc); }
 	bp::list topicMatrix(bp::object category_no) const;
+	bp::list topWords(bp::object category_no, int topk) const;
 	bp::list topicDistOfInference(bp::object category_no) const;
 	bp::list labelOfInference() const;
 
