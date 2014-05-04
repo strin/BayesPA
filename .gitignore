@@ -2,5 +2,5 @@
 *.tags
 *.DS_Store
 *.cmake
-CMakeFiles
+CMakeCache*
 

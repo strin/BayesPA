@@ -13,7 +13,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "utils/Debug.h" 
+#include "utils/debug.h" 
 #include "paMedLDAave.h"
 
 using std::shared_ptr;

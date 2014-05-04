@@ -1,0 +1,2 @@
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/CMakeFiles/bayespa.dir
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineMedLDA/CMakeFiles/dep.dir
