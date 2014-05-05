@@ -1,2 +1,0 @@
-/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles/bayespagibbs.dir
-/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles/dep.dir
