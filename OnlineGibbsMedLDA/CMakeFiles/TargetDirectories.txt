@@ -1,0 +1,2 @@
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/bayespagibbs.dir
+/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/dep.dir
