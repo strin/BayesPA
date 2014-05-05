@@ -307,10 +307,10 @@ void paMedLDAgibbs::draw_Z_test(Sample* sample, SampleZ* prevZ, int i, CorpusDat
 		for( int k = 0; k < K; k++) {
 			weights[k] = cum+(Cdk_test[i][k]+alpha0)*(beta0+gamma[k][t])/(beta0*T+gammasum[k]);
 			cum = weights[k];
-			if( isnan(weights[k])) {
+			if( std::isnan((double)weights[k])) {
 				debug( "error: Z weights nan.\n");
 			}
-			if( isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
+			if( std::isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
 			if( weights[k] > 0) flag0 = 1;
 		}
 		if( flagZ >= 0) prevZ->Z[i][j] = flagZ;

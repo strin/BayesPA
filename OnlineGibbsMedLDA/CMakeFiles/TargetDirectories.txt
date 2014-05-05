@@ -1,2 +1,2 @@
-/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/bayespagibbs.dir
-/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/dep.dir
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles/bayespagibbs.dir
+/afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles/dep.dir

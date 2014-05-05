@@ -38,22 +38,16 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /opt/local/bin/cmake -E remove -f
-
-# Escaping for special characters.
-EQUALS = =
-
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
+RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_SOURCE_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_BINARY_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
 
 #=============================================================================
 # Target rules for target CMakeFiles/bayespagibbs.dir
@@ -62,7 +56,7 @@ CMAKE_BINARY_DIR = "/Volumes/Universe/Research/Machine Learning/BayesPA/code rel
 CMakeFiles/bayespagibbs.dir/all:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/depend
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles"  1 2 3 4 5 6 7 8 9 10 11 12 13
+	$(CMAKE_COMMAND) -E cmake_progress_report /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles  1 2 3 4 5 6 7 8 9 10 11 12 13
 	@echo "Built target bayespagibbs"
 .PHONY : CMakeFiles/bayespagibbs.dir/all
 
@@ -72,9 +66,9 @@ all: CMakeFiles/bayespagibbs.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/bayespagibbs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 13
+	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 13
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/bayespagibbs.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
 .PHONY : CMakeFiles/bayespagibbs.dir/rule
 
 # Convenience name for target.
@@ -97,7 +91,7 @@ clean: CMakeFiles/bayespagibbs.dir/clean
 CMakeFiles/dep.dir/all:
 	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/depend
 	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 
+	$(CMAKE_COMMAND) -E cmake_progress_report /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 
 	@echo "Built target dep"
 .PHONY : CMakeFiles/dep.dir/all
 
@@ -107,9 +101,9 @@ all: CMakeFiles/dep.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/dep.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dep.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Volumes/Universe/Research/Machine Learning/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
 .PHONY : CMakeFiles/dep.dir/rule
 
 # Convenience name for target.
