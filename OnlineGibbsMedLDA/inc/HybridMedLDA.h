@@ -1,5 +1,14 @@
-#ifndef ___paMedLDA_gibbs___
-#define ___paMedLDA_gibbs___
+//  HybridMedLDA is an EM-style inference algorithm for MedLDA.
+//		it maximizes the lower bound of evidence.
+//  E-Step: uses Gibbs sampling to compute Z and \lambda.
+//  M-Step: uses variational inference to infer \eta (Gaussian) and \phi (Dirichlet).
+//
+//  Created by Tianlin Shi on 5/1/13.
+//  Copyright (c) 2013 Tianlin Shi. All rights reserved.
+//
+
+#ifndef ___HybridMedLDA__
+#define ___HybridMedLDA__
 
 #include <iostream>
 
@@ -16,25 +25,28 @@ typedef struct
 	double* my;
 }Commit;
 
-class paMedLDAgibbs {
+class HybridMedLDA {
 public:
-	paMedLDAgibbs( Corpus* corpus, int category = 1);
-	~paMedLDAgibbs();
+	HybridMedLDA( Corpus* corpus, int category = -1);
+	~HybridMedLDA();
 	
 	// draw samples from posterior.
-	void updateZ( SampleZ* prevZ, int batchIdx, int batchSize);
-	void updateLambda( SampleZ* prevZ, int batchIdx, int batchSize);
-	void infer_Phi_Eta( SampleZ* prevZ, int batchIdx, int batchSize, bool reset);
+	void updateZ( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize);
+	void updateLambda( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize);
+	void infer_Phi_Eta( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize, bool reset);
 	void normalize_Phi_Eta(int N, bool remove);
 	void draw_Z_test(Sample* sample, SampleZ* prevZ, int i, CorpusData* dt);
 	void computeZbar(CorpusData* data, SampleZ* Z, int batchIdx);
+	double computeCostFunction(SampleZ* z, CorpusData* dt, int batchIdx, int batchSize);
 	double computeDiscriFunc(CorpusData* dt, int di, Sample* sample, SampleZ* Z, double norm);
 	int eject_sample(CorpusData* dt, SampleZ* Z, int someround); // cancel the effect of mini-batch at some round.
 	
 	// train the model.
 	void init();
 	double train(int num_iter);
-	double inference(CorpusData* testData, int num_test_sample);
+	double inference( CorpusData* testData, int num_test_sample = -1, int category = -1);
+	
+	
 	
 	// output parameters = samples.
 	deque<Sample*>* samples;
@@ -45,9 +57,7 @@ public:
 	Corpus* corpus;
 	
 	// training and testing data.
-	CorpusData *train_data, *test_data;
-	double *my, *py;
-	
+	CorpusData *data, *testData;
 	// training data param for convenience.
 	int batchSize, round; // round is the clock of online algo.
 	bool lets_batch, lets_multic; // batch mode.

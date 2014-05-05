@@ -38,7 +38,7 @@ ADD_LIBRARY(bayespagibbs SHARED
     src/cholesky.cpp
     src/cokus.cpp
     src/Corpus.cpp
-    src/paMedLDAgibbs.cpp
+    src/HybridMedLDA.cpp
     src/InverseGaussian.cpp
     src/Mapper.cpp
     src/MVGaussian.cpp
@@ -47,6 +47,7 @@ ADD_LIBRARY(bayespagibbs SHARED
     src/Setting.cpp
     src/spdinverse.cpp
     src/paMedLDAgibbsWrapper.cpp
+	src/Document.cpp
 )
 
 target_link_libraries(bayespagibbs

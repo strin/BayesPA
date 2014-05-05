@@ -296,16 +296,13 @@ static void inverse_cholydec(double **A, double **res, double **lowerTriangle, c
 	}
 }
 
+// randomly shuffle elements in x for several runs.
 template<class type>
-static void shuffleArray(type *idx, int D) {
-	objcokus cokus;
-	cokus.seedMT(time(NULL));
-	for(int x = 0; x < D; x++) {
-		int y = cokus.randomMT()%D;
-		if(x != y) {
-			type temp = idx[x];
-			idx[x] = idx[y]; idx[y] = temp;
-		}
+static void shuffleArray( type *idx, int D, objcokus& cokus, int iteration = 1000) {
+	for( int it = 0; it < iteration; it++) {
+		type x = cokus.randomMT()%D, y = cokus.randomMT()%D;
+		type temp = idx[x];
+		idx[x] = idx[y]; idx[y] = temp;
 	}
 }
 

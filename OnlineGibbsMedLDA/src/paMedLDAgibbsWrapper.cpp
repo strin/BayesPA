@@ -6,9 +6,9 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
 	string test_file = bp::extract<string>(config["test_file"]);
 	corpus = shared_ptr<Corpus>(new Corpus());
 	corpus->loadDataGML(train_file, test_file);
-	pamedlda.resize(corpus->newsgroup_n);
-	for(int ci = 0; ci < corpus->newsgroup_n; ci++) {
-		pamedlda[ci] = shared_ptr<paMedLDAgibbs>(new paMedLDAgibbs(&*corpus, ci));
+	pamedlda.resize(corpus->newsgroupN);
+	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
+		pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(&*corpus, ci));
 		pamedlda[ci]->K = bp::extract<int>(config["num_topic"]);
 		pamedlda[ci]->batchSize = bp::extract<int>(config["batchsize"]);
 		pamedlda[ci]->lets_multic = true;
@@ -29,39 +29,39 @@ paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper()
 
 
 void paMedLDAgibbsWrapper::train(boost::python::object num_iter) {
-	vector<thread> threads(corpus->newsgroup_n);
-	for(int ci = 0; ci < corpus->newsgroup_n; ci++) {
+	vector<thread> threads(corpus->newsgroupN);
+	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
 		threads[ci] = std::thread([&](int id)  {
 			pamedlda[id]->train(bp::extract<int>(num_iter));		
 		}, ci);
 	}
-	for(int ci = 0; ci < corpus->newsgroup_n; ci++) threads[ci].join();
+	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();
 }
 
 void paMedLDAgibbsWrapper::infer(boost::python::object num_test_sample) {
-	vector<thread> threads(corpus->newsgroup_n);
-	for(int ci = 0; ci < corpus->newsgroup_n; ci++) {
+	vector<thread> threads(corpus->newsgroupN);
+	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
 		threads[ci] = std::thread([&](int id)  {
-			pamedlda[id]->inference(pamedlda[id]->test_data, 
+			pamedlda[id]->inference(pamedlda[id]->testData, 
 							bp::extract<int>(num_test_sample));		
 		}, ci);
 	}
-	for(int ci = 0; ci < corpus->newsgroup_n; ci++) threads[ci].join();	
+	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();	
 	double acc = 0;
-	for( int d = 0; d < pamedlda[0]->test_data->D; d++) {
+	for( int d = 0; d < pamedlda[0]->testData->D; d++) {
 		int label;
 		double confidence = 0-INFINITY;
-		for( int ci = 0; ci < corpus->newsgroup_n; ci++) {
-			if(pamedlda[ci]->my[d] > confidence) {
+		for( int ci = 0; ci < corpus->newsgroupN; ci++) {
+			if(pamedlda[ci]->testData->my[d] > confidence) {
 				label = ci;
-				confidence = pamedlda[ci]->my[d];
+				confidence = pamedlda[ci]->testData->my[d];
 			}
 		}
-		if(corpus->test_data.doc[d].y[0] == label) {
+		if(pamedlda[label]->testData->y[d] == 1) {
 			acc++;
 		}
 	}
-	m_test_acc = (double)acc/(double)pamedlda[0]->test_data->D;	
+	m_test_acc = (double)acc/(double)pamedlda[0]->testData->D;	
 }
 
 bp::object paMedLDAgibbsWrapper::timeElapsed() const {
@@ -69,7 +69,7 @@ bp::object paMedLDAgibbsWrapper::timeElapsed() const {
 	for(auto t : pamedlda) {
 		train_time += t->train_time;
 	}
-	return bp::object(train_time/(double)corpus->newsgroup_n);
+	return bp::object(train_time/(double)corpus->newsgroupN);
 }
 
 bp::list paMedLDAgibbsWrapper::topicMatrix(bp::object category_no) const {
@@ -110,7 +110,7 @@ bp::list paMedLDAgibbsWrapper::topicDistOfInference(bp::object category_no) cons
 	int ci = bp::extract<int>(category_no);
 	bp::list mat;
 	if(pamedlda[ci]->Zbar_test == NULL) return mat;
-	for(int d = 0; d < this->pamedlda[ci]->test_data->D; d++) {
+	for(int d = 0; d < this->pamedlda[ci]->testData->D; d++) {
 		bp::list row;
 		for(int k = 0; k < this->pamedlda[ci]->K; k++) {
 			row.append(pamedlda[ci]->Zbar_test[d][k]);
@@ -122,8 +122,8 @@ bp::list paMedLDAgibbsWrapper::topicDistOfInference(bp::object category_no) cons
 
 bp::list paMedLDAgibbsWrapper::labelOfInference() const {
 	bp::list list;
-	for(int d = 0; d < this->corpus->test_data.D; d++) {
-		list.append(corpus->test_data.doc[d].y[0]);
+	for(int d = 0; d < this->corpus->testDataSize; d++) {
+		list.append(corpus->testData[d]->label);
 	}
 	return list;
 }

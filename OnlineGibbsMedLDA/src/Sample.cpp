@@ -1,3 +1,11 @@
+//
+//  Sample.cpp
+//  OnlineTopic
+//
+//  Created by Tianlin Shi on 5/1/13.
+//  Copyright (c) 2013 Tianlin Shi. All rights reserved.
+//
+
 #include "Sample.h"
 
 Sample::Sample( int K, int T) {
@@ -21,17 +29,18 @@ Sample::~Sample() {
 	}
 }
 
-SampleZ::SampleZ(CorpusData* data) {
-	Z = new int*[data->D];
-	Zbar = new double*[data->D];
+SampleZ::SampleZ( int D, int* W) {
+	Z = new int*[D];
+	Zbar = new double*[D];
 	Cdk = NULL;
-	memset(Z, 0, sizeof(int*)*data->D);
-	memset(Zbar, 0, sizeof(double*)*data->D);
-	invlambda = new double[data->D];
-	for( int i = 0; i < data->D; i++) {
-		Z[i] = new int[data->doc[i].nd];
+	memset(Z, 0, sizeof(int*)*D);
+	memset(Zbar, 0, sizeof(double*)*D);
+	invlambda = new double[D];
+	for( int i = 0; i < D; i++) {
+		Z[i] = new int[W[i]];
 	}
-	this->D = data->D;
+	this->D = D;
+	this->W = W;
 }
 
 SampleZ::~SampleZ() {

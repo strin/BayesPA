@@ -30,24 +30,30 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E remove -f
+RM = /opt/local/bin/cmake -E remove -f
+
+# Escaping for special characters.
+EQUALS = =
+
+# The program to use to edit the cache.
+CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
+CMAKE_SOURCE_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
+CMAKE_BINARY_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
-	/usr/bin/cmake -i .
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -57,7 +63,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -66,14 +72,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks"
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -82,17 +88,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -114,6 +120,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

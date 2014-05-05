@@ -14,7 +14,7 @@
 #include <algorithm>
 
 #include "debug.h" 
-#include "paMedLDAgibbs.h"
+#include "HybridMedLDA.h"
 
 using std::shared_ptr;
 using std::cout;
@@ -48,7 +48,7 @@ struct paMedLDAgibbsWrapper {
 	bp::list labelOfInference() const;
 
 	// boost::python::array getTopWords();
-	vector<shared_ptr<paMedLDAgibbs> > pamedlda;
+	vector<shared_ptr<HybridMedLDA> > pamedlda;
 	shared_ptr<Corpus> corpus;
 
 	double m_test_acc;

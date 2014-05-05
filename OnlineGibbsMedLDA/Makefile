@@ -30,24 +30,30 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E remove -f
+RM = /opt/local/bin/cmake -E remove -f
+
+# Escaping for special characters.
+EQUALS = =
+
+# The program to use to edit the cache.
+CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
+CMAKE_SOURCE_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA
+CMAKE_BINARY_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
-	/usr/bin/cmake -i .
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -57,7 +63,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -66,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/progress.marks"
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /afs/csail.mit.edu/u/s/strin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -144,6 +150,54 @@ src/Corpus.s: src/Corpus.cpp.s
 src/Corpus.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Corpus.cpp.s
 .PHONY : src/Corpus.cpp.s
+
+src/Document.o: src/Document.cpp.o
+.PHONY : src/Document.o
+
+# target to build an object file
+src/Document.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Document.cpp.o
+.PHONY : src/Document.cpp.o
+
+src/Document.i: src/Document.cpp.i
+.PHONY : src/Document.i
+
+# target to preprocess a source file
+src/Document.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Document.cpp.i
+.PHONY : src/Document.cpp.i
+
+src/Document.s: src/Document.cpp.s
+.PHONY : src/Document.s
+
+# target to generate assembly for a file
+src/Document.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Document.cpp.s
+.PHONY : src/Document.cpp.s
+
+src/HybridMedLDA.o: src/HybridMedLDA.cpp.o
+.PHONY : src/HybridMedLDA.o
+
+# target to build an object file
+src/HybridMedLDA.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.o
+.PHONY : src/HybridMedLDA.cpp.o
+
+src/HybridMedLDA.i: src/HybridMedLDA.cpp.i
+.PHONY : src/HybridMedLDA.i
+
+# target to preprocess a source file
+src/HybridMedLDA.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.i
+.PHONY : src/HybridMedLDA.cpp.i
+
+src/HybridMedLDA.s: src/HybridMedLDA.cpp.s
+.PHONY : src/HybridMedLDA.s
+
+# target to generate assembly for a file
+src/HybridMedLDA.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.s
+.PHONY : src/HybridMedLDA.cpp.s
 
 src/InverseGaussian.o: src/InverseGaussian.cpp.o
 .PHONY : src/InverseGaussian.o
@@ -361,30 +415,6 @@ src/objcokus.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/objcokus.cpp.s
 .PHONY : src/objcokus.cpp.s
 
-src/paMedLDAgibbs.o: src/paMedLDAgibbs.cpp.o
-.PHONY : src/paMedLDAgibbs.o
-
-# target to build an object file
-src/paMedLDAgibbs.cpp.o:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/paMedLDAgibbs.cpp.o
-.PHONY : src/paMedLDAgibbs.cpp.o
-
-src/paMedLDAgibbs.i: src/paMedLDAgibbs.cpp.i
-.PHONY : src/paMedLDAgibbs.i
-
-# target to preprocess a source file
-src/paMedLDAgibbs.cpp.i:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/paMedLDAgibbs.cpp.i
-.PHONY : src/paMedLDAgibbs.cpp.i
-
-src/paMedLDAgibbs.s: src/paMedLDAgibbs.cpp.s
-.PHONY : src/paMedLDAgibbs.s
-
-# target to generate assembly for a file
-src/paMedLDAgibbs.cpp.s:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/paMedLDAgibbs.cpp.s
-.PHONY : src/paMedLDAgibbs.cpp.s
-
 src/paMedLDAgibbsWrapper.o: src/paMedLDAgibbsWrapper.cpp.o
 .PHONY : src/paMedLDAgibbsWrapper.o
 
@@ -446,6 +476,12 @@ help:
 	@echo "... src/Corpus.o"
 	@echo "... src/Corpus.i"
 	@echo "... src/Corpus.s"
+	@echo "... src/Document.o"
+	@echo "... src/Document.i"
+	@echo "... src/Document.s"
+	@echo "... src/HybridMedLDA.o"
+	@echo "... src/HybridMedLDA.i"
+	@echo "... src/HybridMedLDA.s"
 	@echo "... src/InverseGaussian.o"
 	@echo "... src/InverseGaussian.i"
 	@echo "... src/InverseGaussian.s"
@@ -473,9 +509,6 @@ help:
 	@echo "... src/objcokus.o"
 	@echo "... src/objcokus.i"
 	@echo "... src/objcokus.s"
-	@echo "... src/paMedLDAgibbs.o"
-	@echo "... src/paMedLDAgibbs.i"
-	@echo "... src/paMedLDAgibbs.s"
 	@echo "... src/paMedLDAgibbsWrapper.o"
 	@echo "... src/paMedLDAgibbsWrapper.i"
 	@echo "... src/paMedLDAgibbsWrapper.s"
