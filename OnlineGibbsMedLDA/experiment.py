@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 import os
 
 m_K = 20
+batchsize = 512
 config = {				"num_topic"			:	m_K, 
-						"batchsize"			:	256,
+						"batchsize"			:	batchsize,
 						"alpha"				:	0.5,
 						"beta"				:	0.45,
 						"c"					:	1,
@@ -23,25 +24,27 @@ pamedlda = paMedLDAgibbs(config)
 # test the prediction accuracy on 20 newsgroup.
 def acc_test():
 	pamedlda.train(11269)
-	print pamedlda.infer(100)
+	pamedlda.infer(100)
+	print 'test accuracy = ', pamedlda.testAcc()
 
 # visualize topic dist.
 def visualize_topic(category_i):
-	dir_name = 'visualize_dist_paMedLDAave_%d'%(category_i)
+	dir_name = 'visualize_dist_paMedLDAgibbs_%d'%(category_i)
 	try:
 	    os.stat(dir_name)
 	except:
 	    os.mkdir(dir_name)
 	dic = file(config['dic_file']).readlines()
-	num_iter = 11269
 	num_category = 20
-	periods = [1,16,256,4096,11269]
+	periods = np.array([1,16,256,4096,11269])/batchsize
 	label = pamedlda.labelOfInference()
 	dist_all = list()
 	topwords_all = list()
+	elapsed = 0
 	for period in periods:
 		print 'period = ', period
-		pamedlda.train(int(period))
+		pamedlda.train(int(period)-elapsed)
+		elapsed = period
 		pamedlda.infer(100)
 		print 'test acc = ', pamedlda.testAcc()
 		mat = np.array(pamedlda.topicDistOfInference(category_i))
