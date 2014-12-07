@@ -2,6 +2,7 @@ from libbayespagibbs import *
 import math
 import scipy.io as sio
 import numpy as np
+import numpy.random as npr
 import matplotlib.pyplot as plt
 import os
 
@@ -21,9 +22,33 @@ config = {  "num_topic"      :  m_K,
             "epoch"        :   1}
 pamedlda = paMedLDAgibbs(config)
 
+def read_gml(path):
+  lines = file(path).readlines()
+  labels = []
+  docs = []
+  for line in lines[1:]:
+    line = line.split(' ')[:-1]
+    label = int(line[1])
+    doc = [int(token) for token in line[2:]]
+    labels += [label]
+    docs += [doc]
+  return (docs, labels)
+
 # test the prediction accuracy on 20 newsgroup.
 def acc_test():
-  pamedlda.train(11269)
+  batch_size = 512
+  (docs, labels) = read_gml('../../data/20ng_train.gml')
+  allind = set(range(len(docs)))
+  while len(allind) > 0:
+    print len(allind)
+    if len(allind) >= batchsize:
+      ind = npr.choice(list(allind), batch_size, replace=False)
+    else:
+      ind = list(allind)
+    allind -= set(ind)
+    batch_doc = [docs[i] for i in ind]
+    batch_label = [labels[i] for i in ind]
+    pamedlda.train(batch_doc, batch_label)
   pamedlda.infer(100)
   print 'test accuracy = ', pamedlda.testAcc()
 
@@ -82,8 +107,8 @@ def visualize_topic(category_i):
   
 if __name__ == '__main__':
   # visualize_topic(0)
-  # acc_test()
-  pamedlda.train([[1,2,3], [4,5,6]], [0, 1])
+  acc_test()
+  # pamedlda.train([[1,2,3], [4,5,6]], [0, 1])
 
 
 

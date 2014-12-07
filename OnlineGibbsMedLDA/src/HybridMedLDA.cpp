@@ -451,14 +451,14 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
 	for( int k = 0; k < K; k++) {
 		for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 			int d = dd%dt->D;
-			stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d]*prevZ->Cdk[d][k]/(double)this->data->W[d];
+			stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d]*prevZ->Cdk[d][k]/(double)dt->W[d];
 		}
 	}
 	for( int k1 = 0; k1 < K; k1++) {
 		for( int k2 = 0; k2 < K; k2++) {
 			for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 				int d = dd%dt->D;
-				stat_icov[k1][k2] += c*c*prevZ->Cdk[d][k1]*prevZ->Cdk[d][k2]*prevZ->invlambda[d]/(double)this->data->W[d]/(double)this->data->W[d];
+				stat_icov[k1][k2] += c*c*prevZ->Cdk[d][k1]*prevZ->Cdk[d][k2]*prevZ->invlambda[d]/(double)dt->W[d]/(double)dt->W[d];
 			}
 		}
 	}
@@ -550,8 +550,8 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 		}
 		computeZbar(data, iZ, d);
 	}
-	updateLambda(iZ, this->data);
-	
+	updateLambda(iZ, data);
+		
 	/* inference via streaming MedLDA */
 	for(int si = 0; si < I; si++) {
 		for( int sj = 0; sj < J; sj++) {
