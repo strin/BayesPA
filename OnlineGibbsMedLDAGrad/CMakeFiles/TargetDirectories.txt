@@ -1,2 +1,0 @@
-/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/bayespagibbs.dir
-/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/dep.dir
