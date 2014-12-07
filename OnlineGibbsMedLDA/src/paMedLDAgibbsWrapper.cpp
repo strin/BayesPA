@@ -31,12 +31,12 @@ paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper()
 }
 
 
-void paMedLDAgibbsWrapper::train(bp::list batch, bp::list labels) {
-	auto batch_vec = filterWord(batch, _numWord());
+void paMedLDAgibbsWrapper::train(bp::list batch, bp::list label) {
+	auto filtered = filterWordAndLabel(batch, label, _numWord(), _numLabel());
 	vector<thread> threads(corpus->newsgroupN);
 	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
 		threads[ci] = std::thread([&](int id)  {
-			pamedlda[id]->train(batch_vec);
+			pamedlda[id]->train(filtered.first, filtered.second);
 		}, ci);
 	}
 	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();
@@ -150,10 +150,14 @@ inline size_t paMedLDAgibbsWrapper::_numLabel() const {
 
 ////////////////////////////////////////////////////////
 //////////// private methods /////////////////////////
-vec2D<int> paMedLDAgibbsWrapper::filterWord(bp::list batch, size_t T) {
+pair<vec2D<int>, vec<int> > 
+paMedLDAgibbsWrapper::filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C) {
 	auto ret = makeVector2D<int>();
+	auto new_label = makeVector<int>();
 	for(size_t ni = 0; ni < bp::len(batch); ni++) {
 		bp::list ex = bp::extract<bp::list>(batch[ni]);
+		size_t y = (size_t)bp::extract<int>(label[ni]);
+		if(y >= C) continue;
 		std::vector<int> row;
 		for(size_t wi = 0; wi < bp::len(ex); wi++) {
 			size_t token = (size_t)bp::extract<int>(ex[wi]);
@@ -162,8 +166,9 @@ vec2D<int> paMedLDAgibbsWrapper::filterWord(bp::list batch, size_t T) {
 			}
 		}
 		ret->push_back(row);
+		new_label->push_back(y);
 	}
-	return ret;
+	return make_pair(ret, new_label);
 }
 
 BOOST_PYTHON_MODULE(libbayespagibbs)

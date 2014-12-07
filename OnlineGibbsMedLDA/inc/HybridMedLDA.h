@@ -45,7 +45,7 @@ public:
 	
 	// train the model.
 	void init();
-	double train(stl::vec2D<int> batch);
+	double train(stl::vec2D<int> batch, stl::vec<int> label);
 	double inference( CorpusData* testData, int num_test_sample = -1, int category = -1);
 	
 	
@@ -96,7 +96,9 @@ public:
 	vector<Commit> commit_points;
 	bool lets_commit;
 	int commit_point_spacing, commit_point_n;
+
 private:
+
 };
 
 

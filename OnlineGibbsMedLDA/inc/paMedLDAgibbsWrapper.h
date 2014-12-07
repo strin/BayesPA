@@ -33,7 +33,7 @@ public:
 	paMedLDAgibbsWrapper(boost::python::dict config);
 	~paMedLDAgibbsWrapper();
 
-	void train(bp::list batch, bp::list labels);
+	void train(bp::list batch, bp::list label);
 	void infer(bp::object num_test_sample);
 	bp::object timeElapsed() const;
 	bp::object testAcc() const {return bp::object(m_test_acc); }
@@ -51,8 +51,9 @@ public:
 	double m_test_acc;
 
 private:
-  /* filter out tokens that are not in range [0, T-1] */
-  pyutils::vec2D<int> filterWord(bp::list batch, size_t T);
+  /* filter out tokens that are not in range [0, T-1], and documents whose label not in [0, C-1]. */
+  std::pair<pyutils::vec2D<int>, pyutils::vec<int> >
+  filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C);
 
   /* return number of words in the vocabulary */
   size_t _numWord() const;

@@ -11,6 +11,7 @@
 #include "gammaln.h"
 
 using namespace stl;
+using namespace std;
 
 HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
 	this->corpus = corpus;
@@ -519,29 +520,36 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
 }
 	
 
-double HybridMedLDA::train(vec2D<int> batch) {
-	int num_iter = 1;
+double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 	clock_t time_start = clock();
 	clock_t time_end;
-	
-	// sampling.
-	int burnin;
-	for( burnin = 0; burnin < num_iter; burnin++, batchIdx += batchSize) {
-		/* training */
-		for(int si = 0; si < I; si++) {
-			for( int sj = 0; sj < J; sj++) {
-				updateZ(iZ, data, batchIdx, batchSize);
-				updateLambda(iZ, data, batchIdx, batchSize);
-				if(sj < J_burnin) continue;
-				infer_Phi_Eta(iZ, data, batchIdx, batchSize, sj==J_burnin);
-			}
-			normalize_Phi_Eta(J-J_burnin, si>0);
-		}
+
+	/* create data samples from raw batch */
+	int data_size = batch->size();
+	DataSample** data_sample = new DataSample*[data_size];
+	for(int di = 0; di < data_size; di++) {
+		data_sample[di] = new DataSample((*batch)[di], (*label)[di]);
 	}
-	// %%%%%%%%%%%% clean
+	CorpusData* data = new CorpusData(data_sample, data_size, this->category);
+	
+	/* inference via streaming MedLDA */
+	for(int si = 0; si < I; si++) {
+		for( int sj = 0; sj < J; sj++) {
+			updateZ(iZ, data, batchIdx, batchSize);
+			updateLambda(iZ, data, batchIdx, batchSize);
+			if(sj < J_burnin) continue;
+			infer_Phi_Eta(iZ, data, batchIdx, batchSize, sj==J_burnin);
+		}
+		normalize_Phi_Eta(J-J_burnin, si>0);
+	}
+
+	/* cleaning */
+	for(int di = 0; di < data_size; di++) {
+		delete data_sample[di];
+	}
+	delete[] data_sample;
 	time_end = clock();
 	train_time += (double)(time_end-time_start)/CLOCKS_PER_SEC;
-	printf( "training_complete: time = %lf, burnin = %d\n", train_time, burnin);
 	return train_time;
 }
 
@@ -708,3 +716,5 @@ double HybridMedLDA::computeCostFunction(SampleZ *z, CorpusData *dt, int batchId
 	return cost;
 }
 
+//////////////////////////////////////////////////////////////////////
+///////////// private methods ////////////////////////////////////////
