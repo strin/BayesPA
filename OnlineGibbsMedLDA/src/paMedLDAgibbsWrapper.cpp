@@ -33,39 +33,47 @@ paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper()
 
 void paMedLDAgibbsWrapper::train(bp::list batch, bp::list label) {
 	auto filtered = filterWordAndLabel(batch, label, _numWord(), _numLabel());
-	vector<thread> threads(corpus->newsgroupN);
-	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
+	int num_category = pamedlda[0]->num_category;
+	vector<thread> threads(num_category);
+	for(int ci = 0; ci < num_category; ci++) {
 		threads[ci] = std::thread([&](int id)  {
 			pamedlda[id]->train(filtered.first, filtered.second);
 		}, ci);
 	}
-	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();
+	for(int ci = 0; ci < num_category; ci++) threads[ci].join();
 }
 
-void paMedLDAgibbsWrapper::infer(boost::python::object num_test_sample) {
-	vector<thread> threads(corpus->newsgroupN);
-	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
+bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::python::object num_test_sample) {
+	int num_category = pamedlda[0]->num_category;
+	auto filtered = filterWordAndLabel(batch, label, _numWord(), _numLabel());
+	auto docs = filtered.first;
+	auto labels = filtered.second;
+	vector<thread> threads(num_category);
+	vector<vector<double> > my(num_category);
+	for(int ci = 0; ci < num_category; ci++) {
 		threads[ci] = std::thread([&](int id)  {
-			pamedlda[id]->inference(pamedlda[id]->testData, 
-							bp::extract<int>(num_test_sample));		
+			my[id] = pamedlda[id]->inference(docs, bp::extract<int>(num_test_sample));		
 		}, ci);
 	}
-	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();	
+	for(int ci = 0; ci < num_category; ci++) threads[ci].join();	
 	double acc = 0;
-	for( int d = 0; d < pamedlda[0]->testData->D; d++) {
-		int label;
+	bp::list ret;
+	for(size_t d = 0; d < labels->size(); d++) {
+		int output = 0;
 		double confidence = 0-INFINITY;
-		for( int ci = 0; ci < corpus->newsgroupN; ci++) {
-			if(pamedlda[ci]->testData->my[d] > confidence) {
-				label = ci;
+		for( int ci = 0; ci < num_category; ci++) {
+			if(my[ci][d] > confidence) {
+				output = ci;
 				confidence = pamedlda[ci]->testData->my[d];
 			}
 		}
-		if(pamedlda[label]->testData->y[d] == 1) {
+		ret.append(output);
+		if(output == (*labels)[d]) {
 			acc++;
 		}
 	}
-	m_test_acc = (double)acc/(double)pamedlda[0]->testData->D;	
+	m_test_acc = (double)acc/(double)labels->size();
+	return ret;
 }
 
 bp::object paMedLDAgibbsWrapper::timeElapsed() const {
@@ -113,11 +121,10 @@ bp::list paMedLDAgibbsWrapper::topWords(bp::object category_no, int topk) const 
 bp::list paMedLDAgibbsWrapper::topicDistOfInference(bp::object category_no) const {
 	int ci = bp::extract<int>(category_no);
 	bp::list mat;
-	if(pamedlda[ci]->Zbar_test == NULL) return mat;
-	for(int d = 0; d < this->pamedlda[ci]->testData->D; d++) {
+	for(const vector<double>& zbar_row : this->pamedlda[ci]->Zbar_test) {
 		bp::list row;
-		for(int k = 0; k < this->pamedlda[ci]->K; k++) {
-			row.append(pamedlda[ci]->Zbar_test[d][k]);
+		for(const double& zbar_entry : zbar_row) {
+			row.append(zbar_entry);
 		}
 		mat.append(row);
 	}
@@ -145,7 +152,7 @@ inline size_t paMedLDAgibbsWrapper::_numWord() const {
 }
 
 inline size_t paMedLDAgibbsWrapper::_numLabel() const {
-	return pamedlda[0]->category;
+	return pamedlda[0]->num_category;
 }
 
 ////////////////////////////////////////////////////////

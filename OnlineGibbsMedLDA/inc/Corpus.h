@@ -34,7 +34,16 @@ public:
 		this->W = ex.size();
 		if(this->W == 0) return;
 		this->words = new int[this->W];
+		for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
 		this->label = label;
+	}
+	/* create data sample for multi-class classification */
+	DataSample(const vector<int>& ex) {
+		this->W = ex.size();
+		if(this->W == 0) return;
+		this->words = new int[this->W];
+		for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
+		this->label = 0;
 	}
 	int* words;
 	int W;

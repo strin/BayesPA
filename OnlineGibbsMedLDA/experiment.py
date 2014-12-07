@@ -27,7 +27,8 @@ def read_gml(path):
   labels = []
   docs = []
   for line in lines[1:]:
-    line = line.split(' ')[:-1]
+    line = line.replace('\n', '')
+    line = line.split(' ')
     label = int(line[1])
     doc = [int(token) for token in line[2:]]
     labels += [label]
@@ -38,6 +39,7 @@ def read_gml(path):
 def acc_test():
   batch_size = 512
   (docs, labels) = read_gml('../../data/20ng_train.gml')
+  (test_docs, test_labels) = read_gml('../../data/20ng_test.gml')
   allind = set(range(len(docs)))
   while len(allind) > 0:
     print len(allind)
@@ -49,7 +51,9 @@ def acc_test():
     batch_doc = [docs[i] for i in ind]
     batch_label = [labels[i] for i in ind]
     pamedlda.train(batch_doc, batch_label)
-  pamedlda.infer(100)
+    break
+  print 'infer'
+  print pamedlda.infer(test_docs, test_labels, 1)
   print 'test accuracy = ', pamedlda.testAcc()
 
 # visualize topic dist.

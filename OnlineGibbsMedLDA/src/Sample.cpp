@@ -45,19 +45,19 @@ SampleZ::SampleZ(int D, int* W) {
 
 
 SampleZ::~SampleZ() {
-	if( Z != 0) {
+	if(Z != 0) {
 		for( int i = 0; i < D; i++)
 			if( Z[i] != 0)
 				delete[] Z[i];
 		delete[] Z;
 	}
-	if( Zbar != 0) {
+	if(Zbar != 0) {
 		for( int i = 0; i < D; i++)
 			if( Zbar[i] != 0)
 				delete[] Zbar[i];
 		delete[] Zbar;
 	}
-	if( invlambda != 0)
+	if(invlambda != 0)
 		delete[] invlambda;
 	if(Cdk) {
 		for( int i = 0; i < D; i++) {
