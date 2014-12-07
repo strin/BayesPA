@@ -33,9 +33,9 @@ public:
 	~HybridMedLDA();
 	
 	// draw samples from posterior.
-	void updateZ( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize);
-	void updateLambda( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize);
-	void infer_Phi_Eta( SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize, bool reset);
+	void updateZ(SampleZ* prevZ, CorpusData* dt);
+	void updateLambda( SampleZ* prevZ, CorpusData* dt);
+	void infer_Phi_Eta( SampleZ* prevZ, CorpusData* dt, bool reset);
 	void normalize_Phi_Eta(int N, bool remove);
 	void draw_Z_test(Sample* sample, SampleZ* prevZ, int i, CorpusData* dt);
 	void computeZbar(CorpusData* data, SampleZ* Z, int batchIdx);
@@ -96,8 +96,6 @@ public:
 	vector<Commit> commit_points;
 	bool lets_commit;
 	int commit_point_spacing, commit_point_n;
-
-private:
 
 };
 

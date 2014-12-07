@@ -29,7 +29,7 @@ Sample::~Sample() {
 	}
 }
 
-SampleZ::SampleZ( int D, int* W) {
+SampleZ::SampleZ(int D, int* W) {
 	Z = new int*[D];
 	Zbar = new double*[D];
 	Cdk = NULL;
@@ -42,6 +42,7 @@ SampleZ::SampleZ( int D, int* W) {
 	this->D = D;
 	this->W = W;
 }
+
 
 SampleZ::~SampleZ() {
 	if( Z != 0) {

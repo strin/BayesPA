@@ -214,7 +214,7 @@ void HybridMedLDA::init() {
 			gamma[k][t] = 0;
 		}
 	}
-	updateLambda(iZ, this->data, 0, data->D);
+	updateLambda(iZ, this->data);
 	
 	batchIdx = 0;
 }
@@ -284,12 +284,13 @@ HybridMedLDA::~HybridMedLDA() {
 	commit_points.clear();
 }
 
-void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt, int batchIdx, int batchSize) {
+void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
 	double weights[K];											// weights for importance sampling.
 	double A1, A2[K], A3, B1, B2;					// replacements for fast computation.
 	int word, N;
 	double sel, cul;
 	int seli;
+	int batchIdx = 0, batchSize = dt->D;
 	for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
 		int i = ii%dt->D;
 		N = dt->W[i];
@@ -343,7 +344,8 @@ void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt, int batchIdx, int bat
 	}
 }
 
-void HybridMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt, int batchIdx, int batchSize) {
+void HybridMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
+	int batchIdx = 0, batchSize = dt->D;
 	for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
 		int i = ii%dt->D;
 		if( data->W[i] == 0) {
@@ -432,8 +434,10 @@ void HybridMedLDA::draw_Z_test(Sample* sample, SampleZ* prevZ, int i, CorpusData
 }
 
 
-void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, int batchIdx, int batchSize, bool reset) {
-	// %%%%%%%%%%%% setting basic parameters for convenience.
+void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
+	int batchIdx = 0, batchSize = dt->D;
+
+	/* setting basic parameters for convenience. */
 	if(reset) {
 		memset(stat_pmean, 0, sizeof(double)*K);
 		for(int k1 = 0; k1 < K; k1++) {
@@ -442,7 +446,8 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, int batchIdx, i
 		}
 		stat_phi_list_end = -1;
 	}
-	// %%%%%%%%%%%% update eta, which is gaussian distribution.
+
+	/* update eta, which is gaussian distribution. */
 	for( int k = 0; k < K; k++) {
 		for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 			int d = dd%dt->D;
@@ -457,7 +462,8 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, int batchIdx, i
 			}
 		}
 	}
-	// %%%%%%%%%%%% update phi, which is dirichlet distribution.
+
+	/* update phi, which is dirichlet distribution. */
 	for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 		int d = dd%dt->D;
 		for(int i = 0; i < dt->W[d]; i++) {
@@ -531,14 +537,28 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 		data_sample[di] = new DataSample((*batch)[di], (*label)[di]);
 	}
 	CorpusData* data = new CorpusData(data_sample, data_size, this->category);
+	SampleZ* iZ = new SampleZ(data->D, data->W);
+	iZ->Cdk = new double*[data->D];
+	for( int i = 0; i < data->D; i++) {
+		iZ->Cdk[i] = new double[K];
+	}
+	for( int d = 0; d < data->D; d++) {
+		memset(iZ->Cdk[d], 0, sizeof(double)*K);
+		for( int w = 0; w < data->W[d]; w++) {
+			iZ->Z[d][w] = cokus.randomMT()%K;
+			iZ->Cdk[d][iZ->Z[d][w]]++;
+		}
+		computeZbar(data, iZ, d);
+	}
+	updateLambda(iZ, this->data);
 	
 	/* inference via streaming MedLDA */
 	for(int si = 0; si < I; si++) {
 		for( int sj = 0; sj < J; sj++) {
-			updateZ(iZ, data, batchIdx, batchSize);
-			updateLambda(iZ, data, batchIdx, batchSize);
+			updateZ(iZ, data);
+			updateLambda(iZ, data);
 			if(sj < J_burnin) continue;
-			infer_Phi_Eta(iZ, data, batchIdx, batchSize, sj==J_burnin);
+			infer_Phi_Eta(iZ, data, sj==J_burnin);
 		}
 		normalize_Phi_Eta(J-J_burnin, si>0);
 	}
