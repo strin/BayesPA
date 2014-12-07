@@ -19,6 +19,8 @@
 #include "MVGaussian.h"
 #include "objcokus.h"
 
+#include "stl.h"
+
 typedef struct
 {
 	double time, ob_percent, accuracy;
@@ -43,7 +45,7 @@ public:
 	
 	// train the model.
 	void init();
-	double train(int num_iter);
+	double train(stl::vec2D<int> batch);
 	double inference( CorpusData* testData, int num_test_sample = -1, int category = -1);
 	
 	

@@ -42,10 +42,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_SOURCE_DIR = "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_BINARY_DIR = "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,14 +72,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks"
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks"
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -88,17 +88,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -120,6 +120,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA" && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

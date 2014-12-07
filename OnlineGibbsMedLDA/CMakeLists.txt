@@ -56,13 +56,14 @@ target_link_libraries(bayespagibbs
   ${PYTHON_LIBRARIES}
 )
 
+ADD_EXECUTABLE(bayespaTest 
+  test/test_pyutils.cpp
+)
 
-#target_link_libraries(test
-#  bayespa
-#  ${LIBS}
-#  ${Boost_LIBRARIES}
-#  ${PYTHON_LIBRARIES}
-#)
-
+target_link_libraries(bayespaTest
+  ${LIBS}
+  ${Boost_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+)
 
 add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )

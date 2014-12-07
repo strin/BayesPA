@@ -5,10 +5,8 @@
 //  Created by Tianlin Shi on 4/30/13.
 //  Copyright (c) 2013 Tianlin Shi. All rights reserved.
 //
-
 #ifndef __OnlineTopic__utils__
 #define __OnlineTopic__utils__
-
 
 #include <iostream>
 #include "dirent.h"
@@ -26,8 +24,6 @@
 #include <vector>
 #include <queue>
 #include "objcokus.h"
-
-
 
 #define UINT32_MAX ((unsigned int)(-1))
 

@@ -10,8 +10,7 @@
 #include "utils.h"
 #include "gammaln.h"
 
-#define CONTRIBUTE(round) (1.0/pow((double)((round)+(u)),(tao)))
-//#define CONTRIBUTE(round) (1)
+using namespace stl;
 
 HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
 	this->corpus = corpus;
@@ -520,7 +519,8 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
 }
 	
 
-double HybridMedLDA::train(int num_iter) {
+double HybridMedLDA::train(vec2D<int> batch) {
+	int num_iter = 1;
 	clock_t time_start = clock();
 	clock_t time_end;
 	

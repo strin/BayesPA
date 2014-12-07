@@ -1,12 +1,6 @@
 #ifndef PY_PAMEDLDA_AVE_WRAPPER_H
 #define PY_PAMEDLDA_AVE_WRAPPER_H
 
-#include <boost/python.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/str.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -14,6 +8,7 @@
 #include <algorithm>
 
 #include "debug.h" 
+#include "pyutils.h"
 #include "HybridMedLDA.h"
 
 using std::shared_ptr;
@@ -22,7 +17,6 @@ using std::endl;
 using std::string;
 using std::vector;
 using std::thread;
-
 
 namespace bp = boost::python;
 
@@ -34,11 +28,12 @@ struct sortable {
     }
 };
 
-struct paMedLDAgibbsWrapper {
+class paMedLDAgibbsWrapper {
+public:
 	paMedLDAgibbsWrapper(boost::python::dict config);
 	~paMedLDAgibbsWrapper();
 
-	void train(bp::object num_iter);
+	void train(bp::list batch, bp::list labels);
 	void infer(bp::object num_test_sample);
 	bp::object timeElapsed() const;
 	bp::object testAcc() const {return bp::object(m_test_acc); }
@@ -47,11 +42,21 @@ struct paMedLDAgibbsWrapper {
 	bp::list topicDistOfInference(bp::object category_no) const;
 	bp::list labelOfInference() const;
 
-	// boost::python::array getTopWords();
 	vector<shared_ptr<HybridMedLDA> > pamedlda;
 	shared_ptr<Corpus> corpus;
 
+  bp::object numWord() const;
+  bp::object numLabel() const;
+
 	double m_test_acc;
+
+private:
+  /* filter out tokens that are not in range [0, T-1] */
+  pyutils::vec2D<int> filterWord(bp::list batch, size_t T);
+
+  /* return number of words in the vocabulary */
+  size_t _numWord() const;
+  size_t _numLabel() const;
 };
 
 

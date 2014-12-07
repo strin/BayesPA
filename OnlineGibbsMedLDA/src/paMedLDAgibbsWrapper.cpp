@@ -1,5 +1,8 @@
 #include "paMedLDAgibbsWrapper.h"
 
+using namespace pyutils;
+using namespace std;
+
 paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config) 
 {
 	string train_file = bp::extract<string>(config["train_file"]);
@@ -28,11 +31,12 @@ paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper()
 }
 
 
-void paMedLDAgibbsWrapper::train(boost::python::object num_iter) {
+void paMedLDAgibbsWrapper::train(bp::list batch, bp::list labels) {
+	auto batch_vec = filterWord(batch, _numWord());
 	vector<thread> threads(corpus->newsgroupN);
 	for(int ci = 0; ci < corpus->newsgroupN; ci++) {
 		threads[ci] = std::thread([&](int id)  {
-			pamedlda[id]->train(bp::extract<int>(num_iter));		
+			pamedlda[id]->train(batch_vec);
 		}, ci);
 	}
 	for(int ci = 0; ci < corpus->newsgroupN; ci++) threads[ci].join();
@@ -128,6 +132,40 @@ bp::list paMedLDAgibbsWrapper::labelOfInference() const {
 	return list;
 }
 
+inline bp::object paMedLDAgibbsWrapper::numWord() const {
+	return bp::object(_numWord());
+}
+
+inline bp::object paMedLDAgibbsWrapper::numLabel() const {
+	return bp::object(_numLabel());
+}
+
+inline size_t paMedLDAgibbsWrapper::_numWord() const {
+	return pamedlda[0]->T;
+}
+
+inline size_t paMedLDAgibbsWrapper::_numLabel() const {
+	return pamedlda[0]->category;
+}
+
+////////////////////////////////////////////////////////
+//////////// private methods /////////////////////////
+vec2D<int> paMedLDAgibbsWrapper::filterWord(bp::list batch, size_t T) {
+	auto ret = makeVector2D<int>();
+	for(size_t ni = 0; ni < bp::len(batch); ni++) {
+		bp::list ex = bp::extract<bp::list>(batch[ni]);
+		std::vector<int> row;
+		for(size_t wi = 0; wi < bp::len(ex); wi++) {
+			size_t token = (size_t)bp::extract<int>(ex[wi]);
+			if(token < T) {
+				row.push_back(token);
+			}
+		}
+		ret->push_back(row);
+	}
+	return ret;
+}
+
 BOOST_PYTHON_MODULE(libbayespagibbs)
 {
   using namespace boost::python;
@@ -141,6 +179,8 @@ BOOST_PYTHON_MODULE(libbayespagibbs)
     .def("topicDistOfInference", &paMedLDAgibbsWrapper::topicDistOfInference)
     .def("labelOfInference", &paMedLDAgibbsWrapper::labelOfInference)
     .def("topWords", &paMedLDAgibbsWrapper::topWords)
+    .def("numWord", &paMedLDAgibbsWrapper::numWord)
+    .def("numLabel", &paMedLDAgibbsWrapper::numLabel)
     ;
 };
 

@@ -14,52 +14,29 @@
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 
-#include <vector>
-#include <string>
-#include <memory>
-#include <iostream>
-
+#include "stl.h"
 
 namespace pyutils {
 
-namespace bp = boost::python;
+using namespace stl;
 
 template<class T>
-using ptr = std::shared_ptr<T>;
-
-template<class T>
-using vec = ptr<std::vector<T> >;
-
-template<class T>
-using vec2D = ptr<std::vector<std::vector<T> > >;
-
-template<class T>
-vec<T> makeVector() {
-  return std::make_shared<std::vector<T> >();
-}
-
-template<class T>
-vec2D<T> makeVector2D() {
-  return std::make_shared<std::vector<std::vector<T> > >();
-}
-
-template<class T>
-vec<T> makeVector(bp::list array) {
-  auto vector = makeVector<T>();
-  for(size_t i = 0; i < bp::len(array); i++) {
-    vector->push_back(bp::extract<T>(array[i]));
+vec<T> makeVector(boost::python::list array) {
+  auto vector = stl::makeVector<T>();
+  for(size_t i = 0; i < boost::python::len(array); i++) {
+    vector->push_back(boost::python::extract<T>(array[i]));
   }
   return vector;
 }
 
 template<class T>
-vec2D<T> makeVector2D(bp::list array) {
-  auto vector2D = makeVector2D<T>();
-  for(size_t i = 0; i < bp::len(array); i++) {
-    bp::list row = bp::extract<bp::list>(array[i]);
+vec2D<T> makeVector2D(boost::python::list array) {
+  auto vector2D = stl::makeVector2D<T>();
+  for(size_t i = 0; i < boost::python::len(array); i++) {
+    boost::python::list row = boost::python::extract<boost::python::list>(array[i]);
     std::vector<T> new_row;
-    for(size_t j = 0; j < bp::len(array[i]); j++) {
-      new_row.push_back(bp::extract<T>(row[i]));
+    for(size_t j = 0; j < boost::python::len(array[i]); j++) {
+      new_row.push_back(boost::python::extract<T>(row[i]));
     }
     vector2D->push_back(new_row);
   }

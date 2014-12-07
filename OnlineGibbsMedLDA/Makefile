@@ -42,10 +42,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_SOURCE_DIR = "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA"
+CMAKE_BINARY_DIR = "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles/progress.marks"
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/OnlineGibbsMedLDA/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -100,6 +100,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named bayespaTest
+
+# Build rule for target.
+bayespaTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bayespaTest
+.PHONY : bayespaTest
+
+# fast build rule for target.
+bayespaTest/fast:
+	$(MAKE) -f CMakeFiles/bayespaTest.dir/build.make CMakeFiles/bayespaTest.dir/build
+.PHONY : bayespaTest/fast
 
 #=============================================================================
 # Target rules for targets named bayespagibbs
@@ -463,12 +476,37 @@ src/spdinverse.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/spdinverse.cpp.s
 .PHONY : src/spdinverse.cpp.s
 
+test/test_pyutils.o: test/test_pyutils.cpp.o
+.PHONY : test/test_pyutils.o
+
+# target to build an object file
+test/test_pyutils.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespaTest.dir/build.make CMakeFiles/bayespaTest.dir/test/test_pyutils.cpp.o
+.PHONY : test/test_pyutils.cpp.o
+
+test/test_pyutils.i: test/test_pyutils.cpp.i
+.PHONY : test/test_pyutils.i
+
+# target to preprocess a source file
+test/test_pyutils.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespaTest.dir/build.make CMakeFiles/bayespaTest.dir/test/test_pyutils.cpp.i
+.PHONY : test/test_pyutils.cpp.i
+
+test/test_pyutils.s: test/test_pyutils.cpp.s
+.PHONY : test/test_pyutils.s
+
+# target to generate assembly for a file
+test/test_pyutils.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespaTest.dir/build.make CMakeFiles/bayespaTest.dir/test/test_pyutils.cpp.s
+.PHONY : test/test_pyutils.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... bayespaTest"
 	@echo "... bayespagibbs"
 	@echo "... dep"
 	@echo "... edit_cache"
@@ -515,6 +553,9 @@ help:
 	@echo "... src/spdinverse.o"
 	@echo "... src/spdinverse.i"
 	@echo "... src/spdinverse.s"
+	@echo "... test/test_pyutils.o"
+	@echo "... test/test_pyutils.i"
+	@echo "... test/test_pyutils.s"
 .PHONY : help
 
 

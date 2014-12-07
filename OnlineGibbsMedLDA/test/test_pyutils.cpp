@@ -3,6 +3,8 @@
 using namespace pyutils;
 using namespace std;
 
+namespace bp = boost::python;
+
 void test_makeVector() {
   bp::list list;
   list.append<int>(1.0);
