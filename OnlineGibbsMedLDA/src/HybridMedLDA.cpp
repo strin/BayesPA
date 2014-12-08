@@ -77,13 +77,13 @@ void HybridMedLDA::init() {
 	testData->py						= new int[testData->D];
 	testData->my						= new double[testData->D];
 	int* idx = new int[data->D];
-	for( int i = 0; i < data->D; i++) idx[i] = i;
-	shuffleArray<int>( idx, data->D, cokus, data->D);
+	for(int i = 0; i < data->D; i++) idx[i] = i;
+	shuffleArray<int>(idx, data->D, cokus, data->D);
 	int train_pos = 0, train_neg = 0, test_pos = 0, test_neg = 0;
 	
-	for( int i = 0; i < data->D; i++) {
+	for(int i = 0; i < data->D; i++) {
 		data->W[i] = corpus->trainData[idx[i]]->W;
-		if( category == -1)
+		if(category == -1)
 			data->y[i] = corpus->trainData[idx[i]]->label;
 		else{
 			if(corpus->multi_label) {
@@ -99,11 +99,11 @@ void HybridMedLDA::init() {
 		train_pos += (1+data->y[i])/2;
 		data->py[i] = 0;
 		data->data[i] = new int[data->W[i]];
-		for( int w = 0; w < data->W[i]; w++) data->data[i][w] = corpus->trainData[idx[i]]->words[w];
+		for(int w = 0; w < data->W[i]; w++) data->data[i][w] = corpus->trainData[idx[i]]->words[w];
 	}
-	for( int i = 0; i < testData->D; i++) {
+	for(int i = 0; i < testData->D; i++) {
 		testData->W[i] = corpus->testData[i]->W;
-		if( category == -1)
+		if(category == -1)
 			testData->y[i] = corpus->testData[i]->label;
 		else{
 			if(corpus->multi_label) {
@@ -119,7 +119,7 @@ void HybridMedLDA::init() {
 		test_pos += (1+testData->y[i])/2;
 		testData->py[i] = 0;
 		testData->data[i] = new int[testData->W[i]];
-		for( int w = 0; w < testData->W[i]; w++) testData->data[i][w] = corpus->testData[i]->words[w];
+		for(int w = 0; w < testData->W[i]; w++) testData->data[i][w] = corpus->testData[i]->words[w];
 	}
 	
 	/* stat init*/
@@ -131,14 +131,14 @@ void HybridMedLDA::init() {
 	stat_pmean = new double[K];
 	prev_eta_pmean = new double[K];
 	memset(stat_pmean, 0, sizeof(double)*K);
-	memset( eta_pmean, 0, sizeof(double)*K);
-	memset( eta_mean, 0, sizeof(double)*K);
+	memset(eta_pmean, 0, sizeof(double)*K);
+	memset(eta_mean, 0, sizeof(double)*K);
 	stat_icov = new double*[K];
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		prev_eta_icov[k] = new double[K];
 		eta_cov[k] = new double[K];
 		eta_icov[k] = new double[K];
-		memset( eta_icov[k], 0, sizeof(double)*K);
+		memset(eta_icov[k], 0, sizeof(double)*K);
 		eta_icov[k][k] = 1/(v*v);
 		stat_icov[k] = new double[K];
 		memset(stat_icov[k], 0, sizeof(double)*K);
@@ -146,7 +146,7 @@ void HybridMedLDA::init() {
 	gamma = new double*[K];
 	prev_gamma = new double*[K];
 	gammasum = new double[K];
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		gamma[k] = new double[T];
 		prev_gamma[k] = new double[T];
 	}
@@ -157,15 +157,15 @@ void HybridMedLDA::init() {
 	stat_phi_list_k = new int[K*T];
 	stat_phi_list_t = new int[K*T];
 	stat_phi_list_end = -1;
-	for( int i = 0; i < K; i++) {
+	for(int i = 0; i < K; i++) {
 		stat_phi[i] = new double[T];
 		memset(stat_phi[i], 0, sizeof(double)*T);
 	}
-	iZ_test = new SampleZ( testData->D, testData->W);
-//	for( int d = 0; d < testData->D; d++) 
+	iZ_test = new SampleZ(testData->D, testData->W);
+//	for(int d = 0; d < testData->D; d++) 
 //		iZ_test->invlambda[d] = invgSampler->sample();
 	forget_factor = new double[maxBurninN+maxSampleN];
-//	printf( "[split] train:%d/%d, test:%d/%d\n", train_pos, train_neg, test_pos, test_neg);
+//	printf("[split] train:%d/%d, test:%d/%d\n", train_pos, train_neg, test_pos, test_neg);
 	pos_ratio = (double)train_pos/(double)(train_pos+train_neg);
 	
 	commit_points.clear();
@@ -175,14 +175,14 @@ void HybridMedLDA::init() {
 	train_time = 0;
 	/* Initialization */
 	invgSampler->reset(1, 1);
-	iZ = new SampleZ( data->D, data->W);
+	iZ = new SampleZ(data->D, data->W);
 	iZ->Cdk = new double*[data->D];
-	for( int i = 0; i < data->D; i++) {
+	for(int i = 0; i < data->D; i++) {
 		iZ->Cdk[i] = new double[K];
 	}
-	for( int d = 0; d < data->D; d++) {
+	for(int d = 0; d < data->D; d++) {
 		memset(iZ->Cdk[d], 0, sizeof(double)*K);
-		for( int w = 0; w < data->W[d]; w++) {
+		for(int w = 0; w < data->W[d]; w++) {
 			iZ->Z[d][w] = cokus.randomMT()%K;
 			iZ->Cdk[d][iZ->Z[d][w]]++;
 		}
@@ -199,9 +199,9 @@ void HybridMedLDA::init() {
 		}
 	}
 	memset(eta_mean, 0, sizeof(double)*K);
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		gammasum[k] = 0;
-		for( int t = 0; t < T; t++) {
+		for(int t = 0; t < T; t++) {
 			gamma[k][t] = 0;
 		}
 	}
@@ -218,10 +218,10 @@ HybridMedLDA::~HybridMedLDA() {
 	delete[] data->y;
 	delete[] data->py;
 	delete[] data->my;
-	for( int i = 0; i < data->D; i++) {
+	for(int i = 0; i < data->D; i++) {
 		delete[] data->data[i];
 	}
-	for( int i = 0; i < testData->D; i++) {
+	for(int i = 0; i < testData->D; i++) {
 		delete[] testData->data[i];
 	}
 	delete[] data->data;
@@ -232,7 +232,7 @@ HybridMedLDA::~HybridMedLDA() {
 	delete[] testData->data;
 	
 	/* clean stat */
-	for( int i = 0; i < K; i++) {
+	for(int i = 0; i < K; i++) {
 		delete[] gamma[i];
 		delete[] prev_gamma[i];
 		delete[] eta_icov[i];
@@ -255,7 +255,7 @@ HybridMedLDA::~HybridMedLDA() {
 	delete[] eta_mean;
 	delete[] prev_eta_pmean;
 	delete[] prev_eta_icov;
-	for( int i = 0; i < samples->size(); i++) {
+	for(int i = 0; i < samples->size(); i++) {
 		Sample* sample = samples->back();
 		delete sample;
 		samples->pop_back();
@@ -288,7 +288,7 @@ void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
 				A2[k1] += 2*eta_cov[k1][k2]*nextZ->Cdk[i][k2];
 			}
 		}
-		for( int j = 0; j < N; j++) {
+		for(int j = 0; j < N; j++) {
 			word = dt->data[i][j];
 			if(word >= T) {
 				debug("error: word %d out of range [0, %d).\n", word, T);
@@ -302,7 +302,7 @@ void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
 			B1 = c*dt->y[i]*(1+c*l*nextZ->invlambda[i])*invN;
 			B2 = c*c*nextZ->invlambda[i]*0.5*invNx2;
 			int flagZ = -1, flag0 = -1; // flag for abnomality.
-			for( int k = 0; k < K; k++) {
+			for(int k = 0; k < K; k++) {
 				A3 = eta_mean[k]*eta_mean[k]+eta_cov[k][k];
 				if(k == 0) cul = 0;
 				else cul = weights[k-1];
@@ -312,18 +312,18 @@ void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
 							/* strategy 2 approximation that does not require digamma() */
 							*(beta0+gamma[k][word])/(beta0*T+gammasum[k])
 							*exp(B1*eta_mean[k]-B2*(A3+(A1*eta_mean[k]+A2[k])));
-				if( isnan(weights[k])) {
-					debug( "error: Z weights nan.\n");
+				if(std::isnan(weights[k])) {
+					debug("error: Z weights nan.\n");
 					flagZ = k;
 				}
-				if( isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
-				if( weights[k] > 0) flag0 = 1;
+				if(std::isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
+				if(weights[k] > 0) flag0 = 1;
 			}
-			if( flagZ >= 0) nextZ->Z[i][j] = flagZ;
-			else if( flag0 == -1) nextZ->Z[i][j] = cokus.randomMT()%K;
+			if(flagZ >= 0) nextZ->Z[i][j] = flagZ;
+			else if(flag0 == -1) nextZ->Z[i][j] = cokus.randomMT()%K;
 			else {
 				sel = weights[K-1]*cokus.random01();
-				for( seli = 0; weights[seli] < sel; seli++);
+				for(seli = 0; weights[seli] < sel; seli++);
 				nextZ->Z[i][j] = seli;
 			}
 			for(int k = 0; k < K; k++) {
@@ -338,16 +338,16 @@ void HybridMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
 	int batchIdx = 0, batchSize = dt->D;
 	for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
 		int i = ii%dt->D;
-		if( data->W[i] == 0) {
-			debug( "[error] document length 0\n");
+		if(data->W[i] == 0) {
+			debug("[error] document length 0\n");
 		}
 		double discriFunc = 0;
-		for( int k = 0; k < K; k++)
+		for(int k = 0; k < K; k++)
 			discriFunc += eta_mean[k]*prevZ->Cdk[i][k]/(double)dt->W[i];
 		double zetad = l-data->y[i]*discriFunc;
 		double bilinear = 0;
-		for( int k1 = 0; k1 < K; k1++) {
-			for( int k2 = 0; k2 < K; k2++) {
+		for(int k1 = 0; k1 < K; k1++) {
+			for(int k2 = 0; k2 < K; k2++) {
 				bilinear += prevZ->Cdk[i][k1]*prevZ->Cdk[i][k2]*eta_cov[k1][k2]/(double)dt->W[i]/(double)dt->W[i];
 			}
 		}
@@ -357,21 +357,21 @@ void HybridMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
 }
 
 void HybridMedLDA::computeZbar(CorpusData* data, SampleZ *Z, int di) {
-	if( Z->Zbar[di] == 0)
+	if(Z->Zbar[di] == 0)
 		Z->Zbar[di] = new double[K];
-	memset( Z->Zbar[di], 0, sizeof(double)*K);
-	for( int j = 0; j < data->W[di]; j++) {
+	memset(Z->Zbar[di], 0, sizeof(double)*K);
+	for(int j = 0; j < data->W[di]; j++) {
 		Z->Zbar[di][Z->Z[di][j]]++;
 	}
-	for( int k = 0; k < K; k++) Z->Zbar[di][k] /= data->W[di]; // normalize.
+	for(int k = 0; k < K; k++) Z->Zbar[di][k] /= data->W[di]; // normalize.
 }
 
 double HybridMedLDA::computeDiscriFunc(CorpusData* dt, int di, Sample *sample, SampleZ *Z, double norm) {
 	double discriFunc = 0;
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		discriFunc += sample->eta[k]*Z->Cdk[di][k];
 	}
-	if( norm == 0)
+	if(norm == 0)
 		return discriFunc/(double)dt->W[di];
 	else
 		return discriFunc/(double)norm;
@@ -385,7 +385,7 @@ void HybridMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
 	
 	// statistics Cdk.
 	double weights[K]; // weights for importance sampling.
-	for( int j = 0; j < W[i]; j++) {
+	for(int j = 0; j < W[i]; j++) {
 		int t = dt->data[i][j];
 		if(t >= T) {
 			debug("error: word %d out of range [0, %d).\n", t, T);
@@ -395,31 +395,31 @@ void HybridMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
 		Ckt_test_sum[prevZ->Z[i][j]]--;
 		int flagZ = -1, flag0 = -1;
 		double cum = 0;
-		for( int k = 0; k < K; k++) {
+		for(int k = 0; k < K; k++) {
 			weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t]+Ckt_test[k][t])/(beta0*T+gammasum[k]+Ckt_test_sum[k]);
 			cum = weights[k];
-			if( isnan(weights[k])) {
-				debug( "error: Z weights nan.\n");
+			if(std::isnan(weights[k])) {
+				debug("error: Z weights nan.\n");
 			}
-			if( isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
-			if( weights[k] > 0) flag0 = 1;
+			if(std::isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
+			if(weights[k] > 0) flag0 = 1;
 		}
-		if( flagZ >= 0) prevZ->Z[i][j] = flagZ;
-		else if( flag0 == -1) prevZ->Z[i][j] = cokus.randomMT()%K;
+		if(flagZ >= 0) prevZ->Z[i][j] = flagZ;
+		else if(flag0 == -1) prevZ->Z[i][j] = cokus.randomMT()%K;
 		else {
 			sel = weights[K-1]*cokus.random01();
-			for( seli = 0; weights[seli] < sel; seli++);
+			for(seli = 0; weights[seli] < sel; seli++);
 			prevZ->Z[i][j] = seli;
 		}
 		prevZ->Cdk[i][prevZ->Z[i][j]]++; // restore Cdk, Ckt.
 		Ckt_test[prevZ->Z[i][j]][t]++;
 		Ckt_test_sum[prevZ->Z[i][j]]++;
 	}
-	memset( prevZ->Zbar[i], 0, sizeof(double)*K);
-	for( int j = 0; j < W[i]; j++) {
+	memset(prevZ->Zbar[i], 0, sizeof(double)*K);
+	for(int j = 0; j < W[i]; j++) {
 		prevZ->Zbar[i][prevZ->Z[i][j]]++;
 	}
-	for( int k = 0; k < K; k++) prevZ->Zbar[i][k] /= W[i]; // normalize.
+	for(int k = 0; k < K; k++) prevZ->Zbar[i][k] /= W[i]; // normalize.
 }
 
 
@@ -437,14 +437,14 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
 	}
 
 	/* update eta, which is gaussian distribution. */
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 			int d = dd%dt->D;
 			stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d]*prevZ->Cdk[d][k]/(double)dt->W[d];
 		}
 	}
-	for( int k1 = 0; k1 < K; k1++) {
-		for( int k2 = 0; k2 < K; k2++) {
+	for(int k1 = 0; k1 < K; k1++) {
+		for(int k2 = 0; k2 < K; k2++) {
 			for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
 				int d = dd%dt->D;
 				stat_icov[k1][k2] += c*c*prevZ->Cdk[d][k1]*prevZ->Cdk[d][k2]*prevZ->invlambda[d]/(double)dt->W[d]/(double)dt->W[d];
@@ -469,17 +469,17 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
 
 void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
 	double** eta_lowertriangle = new double*[K];
-	for( int i = 0; i < K; i++) {
+	for(int i = 0; i < K; i++) {
 		eta_lowertriangle[i] = new double[K];
 	}
 	// %%%%%%%%%%%% normalize eta, which is gaussian distribution.
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		if(remove) eta_pmean[k] -= prev_eta_pmean[k];
 		prev_eta_pmean[k] = stat_pmean[k]*data->D/(double)batchSize/(double)N;
 		eta_pmean[k] += prev_eta_pmean[k];
 	}
-	for( int k1 = 0; k1 < K; k1++) {
-		for( int k2 = 0; k2 < K; k2++) {
+	for(int k1 = 0; k1 < K; k1++) {
+		for(int k2 = 0; k2 < K; k2++) {
 			if(remove) eta_icov[k1][k2] -= prev_eta_icov[k1][k2];
 			prev_eta_icov[k1][k2] = stat_icov[k1][k2]*data->D/(double)batchSize/(double)N;
 			eta_icov[k1][k2] += prev_eta_icov[k1][k2];
@@ -505,10 +505,10 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
 	}
 	// %%%%%%%%%%%% compute aux information.
 	inverse_cholydec(eta_icov, eta_cov, eta_lowertriangle, K);
-	for( int k = 0; k < K; k++) {
-		eta_mean[k] = dotprod( eta_cov[k], eta_pmean, K);
+	for(int k = 0; k < K; k++) {
+		eta_mean[k] = dotprod(eta_cov[k], eta_pmean, K);
 	}
-	for( int i = 0; i < K; i++) {
+	for(int i = 0; i < K; i++) {
 		delete[] eta_lowertriangle[i];
 	}
 	delete[] eta_lowertriangle;
@@ -528,12 +528,12 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 	CorpusData* data = new CorpusData(data_sample, data_size, this->category);
 	SampleZ* iZ = new SampleZ(data->D, data->W);
 	iZ->Cdk = new double*[data->D];
-	for( int i = 0; i < data->D; i++) {
+	for(int i = 0; i < data->D; i++) {
 		iZ->Cdk[i] = new double[K];
 	}
-	for( int d = 0; d < data->D; d++) {
+	for(int d = 0; d < data->D; d++) {
 		memset(iZ->Cdk[d], 0, sizeof(double)*K);
-		for( int w = 0; w < data->W[d]; w++) {
+		for(int w = 0; w < data->W[d]; w++) {
 			iZ->Z[d][w] = cokus.randomMT()%K;
 			iZ->Cdk[d][iZ->Z[d][w]]++;
 		}
@@ -543,7 +543,7 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 
 	/* inference via streaming MedLDA */
 	for(int si = 0; si < I; si++) {
-		for( int sj = 0; sj < J; sj++) {
+		for(int sj = 0; sj < J; sj++) {
 			updateZ(iZ, data);
 			updateLambda(iZ, data);
 			if(sj < J_burnin) continue;
@@ -591,21 +591,21 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
 	Ckt_test.resize(K);
 	Ckt_test_sum.resize(K, 0);
 
-	for( int k = 0; k < K; k++) {
+	for(int k = 0; k < K; k++) {
 		eta_lowertriangle[k] = new double[K];
 		Ckt_test[k].resize(T, 0);
 	}
 
 	Zbar_test.resize(testData->D);
 	iZ_test->Cdk = new double*[testData->D];
-	for( int d = 0; d < testData->D; d++) {
+	for(int d = 0; d < testData->D; d++) {
 		Zbar_test[d].resize(K, 0);
 		iZ_test->Cdk[d] = new double[K];
 		iZ_test->Zbar[d] = new double[K];
 		memset(iZ_test->Cdk[d], 0, sizeof(double)*K);
 		memset(iZ_test->Zbar[d], 0, sizeof(double)*K);
 
-		for( int w = 0; w < testData->W[d]; w++) {
+		for(int w = 0; w < testData->W[d]; w++) {
 			iZ_test->Z[d][w] = cokus.randomMT()%K;
 			Ckt_test[iZ_test->Z[d][w]][testData->data[d][w]]++;
 			Ckt_test_sum[iZ_test->Z[d][w]]++;
@@ -615,18 +615,18 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
 
 	/* sample Z with Gibbs sampling.*/
 	int zcount = 0;
-	for( int it = 0; it < max_gibbs_iter; it++) {
-		for( int d = 0; d < testData->D; d++) {
+	for(int it = 0; it < max_gibbs_iter; it++) {
+		for(int d = 0; d < testData->D; d++) {
 			draw_Z_test(iZ_test, d, testData);
 		}
 		if(it < testBurninN) continue;
 		zcount++;
 		for(int d = 0; d < testData->D; d++) {
-			for( int k = 0; k < K; k++) Zbar_test[d][k] += iZ_test->Zbar[d][k];
+			for(int k = 0; k < K; k++) Zbar_test[d][k] += iZ_test->Zbar[d][k];
 		}
 	}
 	for(int d = 0; d < testData->D; d++) {
-		for( int k = 0; k < K; k++) Zbar_test[d][k] /= (double)zcount;
+		for(int k = 0; k < K; k++) Zbar_test[d][k] /= (double)zcount;
 	}
 
 	/* evaluate inference accuracy.*/
@@ -708,8 +708,8 @@ double HybridMedLDA::computeCostFunction(SampleZ *z, CorpusData *dt, int batchId
 		}
 	}
 	inverse_cholydec(eta_icov0, eta_cov0, eta_lowertriangle, K);
-	for( int k = 0; k < K; k++) {
-		eta_mean0[k] = dotprod( eta_cov0[k], eta_pmean0, K);
+	for(int k = 0; k < K; k++) {
+		eta_mean0[k] = dotprod(eta_cov0[k], eta_pmean0, K);
 	}
 	for(int k = 0; k < K; k++) {
 		for(int j = 0; j < K; j++) {
