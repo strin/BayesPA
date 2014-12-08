@@ -396,7 +396,7 @@ void HybridMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
 		int flagZ = -1, flag0 = -1;
 		double cum = 0;
 		for( int k = 0; k < K; k++) {
-			weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t])/(beta0*T+gammasum[k]);
+			weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t]+Ckt_test[k][t])/(beta0*T+gammasum[k]+Ckt_test_sum[k]);
 			cum = weights[k];
 			if( isnan(weights[k])) {
 				debug( "error: Z weights nan.\n");
@@ -540,6 +540,7 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 		computeZbar(data, iZ, d);
 	}
 	updateLambda(iZ, data);
+
 	/* inference via streaming MedLDA */
 	for(int si = 0; si < I; si++) {
 		for( int sj = 0; sj < J; sj++) {
@@ -627,15 +628,16 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
 	for(int d = 0; d < testData->D; d++) {
 		for( int k = 0; k < K; k++) Zbar_test[d][k] /= (double)zcount;
 	}
+
 	/* evaluate inference accuracy.*/
   int acc = 0;
   vector<double> my;
-	for( int i = 0; i < testData->D; i++) {
+	for(int i = 0; i < testData->D; i++) {
 		double discriFunc = 0;
-		for( int k = 0; k < K; k++)
+		for(int k = 0; k < K; k++)
 			discriFunc += eta_mean[k]*Zbar_test[i][k];
 		testData->my[i] = discriFunc;
-		if( discriFunc >= 0) testData->py[i] = 1;
+		if(discriFunc >= 0) testData->py[i] = 1;
 		else testData->py[i] = -1;
 
 		my.push_back(testData->my[i]);

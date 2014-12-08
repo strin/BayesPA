@@ -51,9 +51,8 @@ def acc_test():
     batch_doc = [docs[i] for i in ind]
     batch_label = [labels[i] for i in ind]
     pamedlda.train(batch_doc, batch_label)
-    break
   print 'infer'
-  print pamedlda.infer(test_docs, test_labels, 1)
+  print pamedlda.infer(test_docs, test_labels, 100)
   print 'test accuracy = ', pamedlda.testAcc()
 
 # visualize topic dist.
