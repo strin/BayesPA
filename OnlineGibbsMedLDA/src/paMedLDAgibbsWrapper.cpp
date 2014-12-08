@@ -64,7 +64,7 @@ bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::pyth
     for( int ci = 0; ci < num_category; ci++) {
       if(my[ci][d] > confidence) {
         output = ci;
-        confidence = pamedlda[ci]->testData->my[d];
+        confidence = my[ci][d];
       }
     }
     ret.append(output);

@@ -555,7 +555,7 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
   for(int di = 0; di < data_size; di++) {
     data_sample[di] = new DataSample((*batch)[di]);
   }
-  CorpusData* testData = new CorpusData(&data_sample[0], data_size, category);
+  CorpusData* testData = new CorpusData(&data_sample[0], data_size, this->category);
   SampleZ* iZ_test = new SampleZ(testData->D, testData->W);
 
   /* initialization for inference */
