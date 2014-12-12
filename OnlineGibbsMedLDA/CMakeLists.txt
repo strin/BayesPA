@@ -37,7 +37,7 @@ ADD_LIBRARY(bayespagibbs SHARED
     src/ap.cpp
     src/cholesky.cpp
     src/cokus.cpp
-    src/HybridMedLDA.cpp
+    src/OnlineGibbsMedLDA.cpp
     src/InverseGaussian.cpp
     src/Mapper.cpp
     src/MVGaussian.cpp
@@ -65,4 +65,4 @@ target_link_libraries(bayespaTest
   ${PYTHON_LIBRARIES}
 )
 
-add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )
+# add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )

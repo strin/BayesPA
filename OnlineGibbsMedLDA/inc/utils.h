@@ -25,7 +25,6 @@
 #include <queue>
 #include "objcokus.h"
 
-#define UINT32_MAX ((unsigned int)(-1))
 
 using namespace std;
 

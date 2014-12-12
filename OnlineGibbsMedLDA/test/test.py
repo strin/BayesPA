@@ -28,13 +28,7 @@ class BinaryclassTest(unittest.TestCase):
   def setUp(me):
     m_K = 5
     me.batchsize = 64
-    config = {  "num_topic"      :  m_K, 
-                "alpha"        :  0.5,
-                "beta"        :  0.45,
-                "c"          :  1,
-                "l"          :  164,
-                "I"          :  1,
-                "J"          :  3,
+    config = {  "#topic"      :  m_K, 
                 "train_file"    :  "../../../data/AtheismReligionMisc_Binary_train_nomalletstopwrd.gml",
                 "test_file"      :  "../../../data/AtheismReligionMisc_Binary_test_nomalletstopwrd.gml",
                 "dic_file"      :   "../../../data/dic.txt",
@@ -48,6 +42,7 @@ class BinaryclassTest(unittest.TestCase):
 
   def test_acc(me):
     allind = set(range(len(me.docs)))
+    print '> train'
     while len(allind) > 0:
       print len(allind)
       if len(allind) >= me.batchsize:
@@ -68,14 +63,8 @@ class MulticlassTest(unittest.TestCase):
   def setUp(me):
     m_K = 20
     me.batchsize = 512
-    config = {  "num_topic"      :  m_K, 
+    config = {  "#topic"      :  m_K, 
                 "batchsize"      :  me.batchsize,
-                "alpha"        :  0.5,
-                "beta"        :  0.45,
-                "c"          :  1,
-                "l"          :  164,
-                "I"          :  1,
-                "J"          :  3,
                 "train_file"    :  "../../../data/20ng_train.gml",
                 "test_file"      :  "../../../data/20ng_test.gml",
                 "dic_file"      :   "../../../data/dic.txt",
@@ -89,6 +78,7 @@ class MulticlassTest(unittest.TestCase):
 
   def test_acc(me):
     allind = set(range(len(me.docs)))
+    print '> train'
     while len(allind) > 0:
       print len(allind)
       if len(allind) >= me.batchsize:
@@ -99,8 +89,8 @@ class MulticlassTest(unittest.TestCase):
       batch_doc = [me.docs[i] for i in ind]
       batch_label = [me.labels[i] for i in ind]
       me.pamedlda.train(batch_doc, batch_label)
-    print 'infer'
-    print me.pamedlda.infer(me.test_docs, me.test_labels, 100)
+    print '> infer'
+    me.pamedlda.infer(me.test_docs, me.test_labels, 100)
     print 'test accuracy = ', me.pamedlda.testAcc()
     assert(me.pamedlda.testAcc() > 0.79)
 

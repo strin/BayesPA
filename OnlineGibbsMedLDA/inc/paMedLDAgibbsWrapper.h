@@ -9,7 +9,7 @@
 
 #include "debug.h" 
 #include "pyutils.h"
-#include "HybridMedLDA.h"
+#include "OnlineGibbsMedLDA.h"
 
 using std::shared_ptr;
 using std::cout;
@@ -41,7 +41,7 @@ public:
 	bp::list topWords(bp::object category_no, int topk) const;
 	bp::list topicDistOfInference(bp::object category_no) const;
 
-	vector<shared_ptr<HybridMedLDA> > pamedlda;
+	vector<shared_ptr<OnlineGibbsMedLDA> > pamedlda;
 
 	bp::object numWord() const;
 	bp::object numLabel() const;

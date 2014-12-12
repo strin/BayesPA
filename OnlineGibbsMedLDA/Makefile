@@ -124,19 +124,6 @@ bayespagibbs/fast:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/build
 .PHONY : bayespagibbs/fast
 
-#=============================================================================
-# Target rules for targets named dep
-
-# Build rule for target.
-dep: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 dep
-.PHONY : dep
-
-# fast build rule for target.
-dep/fast:
-	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
-.PHONY : dep/fast
-
 src/Document.o: src/Document.cpp.o
 .PHONY : src/Document.o
 
@@ -160,30 +147,6 @@ src/Document.s: src/Document.cpp.s
 src/Document.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Document.cpp.s
 .PHONY : src/Document.cpp.s
-
-src/HybridMedLDA.o: src/HybridMedLDA.cpp.o
-.PHONY : src/HybridMedLDA.o
-
-# target to build an object file
-src/HybridMedLDA.cpp.o:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.o
-.PHONY : src/HybridMedLDA.cpp.o
-
-src/HybridMedLDA.i: src/HybridMedLDA.cpp.i
-.PHONY : src/HybridMedLDA.i
-
-# target to preprocess a source file
-src/HybridMedLDA.cpp.i:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.i
-.PHONY : src/HybridMedLDA.cpp.i
-
-src/HybridMedLDA.s: src/HybridMedLDA.cpp.s
-.PHONY : src/HybridMedLDA.s
-
-# target to generate assembly for a file
-src/HybridMedLDA.cpp.s:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/HybridMedLDA.cpp.s
-.PHONY : src/HybridMedLDA.cpp.s
 
 src/InverseGaussian.o: src/InverseGaussian.cpp.o
 .PHONY : src/InverseGaussian.o
@@ -256,6 +219,30 @@ src/Mapper.s: src/Mapper.cpp.s
 src/Mapper.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Mapper.cpp.s
 .PHONY : src/Mapper.cpp.s
+
+src/OnlineGibbsMedLDA.o: src/OnlineGibbsMedLDA.cpp.o
+.PHONY : src/OnlineGibbsMedLDA.o
+
+# target to build an object file
+src/OnlineGibbsMedLDA.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/OnlineGibbsMedLDA.cpp.o
+.PHONY : src/OnlineGibbsMedLDA.cpp.o
+
+src/OnlineGibbsMedLDA.i: src/OnlineGibbsMedLDA.cpp.i
+.PHONY : src/OnlineGibbsMedLDA.i
+
+# target to preprocess a source file
+src/OnlineGibbsMedLDA.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/OnlineGibbsMedLDA.cpp.i
+.PHONY : src/OnlineGibbsMedLDA.cpp.i
+
+src/OnlineGibbsMedLDA.s: src/OnlineGibbsMedLDA.cpp.s
+.PHONY : src/OnlineGibbsMedLDA.s
+
+# target to generate assembly for a file
+src/OnlineGibbsMedLDA.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/OnlineGibbsMedLDA.cpp.s
+.PHONY : src/OnlineGibbsMedLDA.cpp.s
 
 src/Sample.o: src/Sample.cpp.o
 .PHONY : src/Sample.o
@@ -481,15 +468,11 @@ help:
 	@echo "... depend"
 	@echo "... bayespaTest"
 	@echo "... bayespagibbs"
-	@echo "... dep"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... src/Document.o"
 	@echo "... src/Document.i"
 	@echo "... src/Document.s"
-	@echo "... src/HybridMedLDA.o"
-	@echo "... src/HybridMedLDA.i"
-	@echo "... src/HybridMedLDA.s"
 	@echo "... src/InverseGaussian.o"
 	@echo "... src/InverseGaussian.i"
 	@echo "... src/InverseGaussian.s"
@@ -499,6 +482,9 @@ help:
 	@echo "... src/Mapper.o"
 	@echo "... src/Mapper.i"
 	@echo "... src/Mapper.s"
+	@echo "... src/OnlineGibbsMedLDA.o"
+	@echo "... src/OnlineGibbsMedLDA.i"
+	@echo "... src/OnlineGibbsMedLDA.s"
 	@echo "... src/Sample.o"
 	@echo "... src/Sample.i"
 	@echo "... src/Sample.s"

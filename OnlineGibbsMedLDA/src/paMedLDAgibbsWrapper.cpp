@@ -13,16 +13,26 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
   pamedlda.resize(_numLabel);
 
   for(int ci = 0; ci < _numLabel; ci++) {
-    pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(ci));
-    pamedlda[ci]->K = bp::extract<int>(config["num_topic"]);
-    pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
-    pamedlda[ci]->beta0 = bp::extract<float>(config["beta"]);
-    pamedlda[ci]->c = bp::extract<float>(config["c"]);
-    pamedlda[ci]->l = bp::extract<float>(config["l"]);
-    pamedlda[ci]->I = bp::extract<int>(config["I"]);
-    pamedlda[ci]->J = bp::extract<int>(config["J"]);
+    pamedlda[ci] = shared_ptr<OnlineGibbsMedLDA>(new OnlineGibbsMedLDA(ci));
+
+    /* hyper-parameters */
+    pamedlda[ci]->K = bp::extract<int>(config["#topic"]);
     pamedlda[ci]->T = _numWord;
     pamedlda[ci]->init();
+
+    /* optional parameters */
+    if(config.has_key("alpha"))
+      pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
+    if(config.has_key("beta"))
+      pamedlda[ci]->beta0 = bp::extract<float>(config["beta"]);
+    if(config.has_key("c"))
+      pamedlda[ci]->c = bp::extract<float>(config["c"]);
+    if(config.has_key("l"))
+      pamedlda[ci]->l = bp::extract<float>(config["l"]);
+    if(config.has_key("I"))
+      pamedlda[ci]->I = bp::extract<int>(config["I"]);
+    if(config.has_key("J"))
+      pamedlda[ci]->J = bp::extract<int>(config["J"]);
   }
 }
 
