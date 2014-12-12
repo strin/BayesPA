@@ -7,13 +7,12 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
 {
   string train_file = bp::extract<string>(config["train_file"]);
   string test_file = bp::extract<string>(config["test_file"]);
-  corpus = shared_ptr<Corpus>(new Corpus());
-  corpus->loadDataGML(train_file, test_file);
-  pamedlda.resize(corpus->newsgroupN);
-  this->_numLabel = corpus->newsgroupN;
-  this->_numWord = corpus->T;
+  this->_numLabel = bp::extract<int>(config["#label"]);
+  this->_numWord = bp::extract<int>(config["#word"]);
 
-  for(int ci = 0; ci < corpus->newsgroupN; ci++) {
+  pamedlda.resize(_numLabel);
+
+  for(int ci = 0; ci < _numLabel; ci++) {
     pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(ci));
     pamedlda[ci]->K = bp::extract<int>(config["num_topic"]);
     pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
@@ -22,14 +21,13 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
     pamedlda[ci]->l = bp::extract<float>(config["l"]);
     pamedlda[ci]->I = bp::extract<int>(config["I"]);
     pamedlda[ci]->J = bp::extract<int>(config["J"]);
-    pamedlda[ci]->T = corpus->T;
+    pamedlda[ci]->T = _numWord;
     pamedlda[ci]->init();
   }
 }
 
 paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper() 
 {
-
 }
 
 
@@ -81,7 +79,7 @@ bp::object paMedLDAgibbsWrapper::timeElapsed() const {
   for(auto t : pamedlda) {
     train_time += t->train_time;
   }
-  return bp::object(train_time/(double)corpus->newsgroupN);
+  return bp::object(train_time/(double)_numLabel);
 }
 
 bp::list paMedLDAgibbsWrapper::topicMatrix(bp::object category_no) const {
@@ -131,14 +129,6 @@ bp::list paMedLDAgibbsWrapper::topicDistOfInference(bp::object category_no) cons
   return mat;
 }
 
-bp::list paMedLDAgibbsWrapper::labelOfInference() const {
-  bp::list list;
-  for(int d = 0; d < this->corpus->testDataSize; d++) {
-    list.append(corpus->testData[d]->label);
-  }
-  return list;
-}
-
 inline bp::object paMedLDAgibbsWrapper::numWord() const {
   return bp::object(_numWord);
 }
@@ -182,7 +172,6 @@ BOOST_PYTHON_MODULE(libbayespagibbs)
     .def("testAcc", &paMedLDAgibbsWrapper::testAcc)
     .def("topicMatrix", &paMedLDAgibbsWrapper::topicMatrix)
     .def("topicDistOfInference", &paMedLDAgibbsWrapper::topicDistOfInference)
-    .def("labelOfInference", &paMedLDAgibbsWrapper::labelOfInference)
     .def("topWords", &paMedLDAgibbsWrapper::topWords)
     .def("numWord", &paMedLDAgibbsWrapper::numWord)
     .def("numLabel", &paMedLDAgibbsWrapper::numLabel)

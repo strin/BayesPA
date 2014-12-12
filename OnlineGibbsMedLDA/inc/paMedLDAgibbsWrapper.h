@@ -40,10 +40,8 @@ public:
 	bp::list topicMatrix(bp::object category_no) const;
 	bp::list topWords(bp::object category_no, int topk) const;
 	bp::list topicDistOfInference(bp::object category_no) const;
-	bp::list labelOfInference() const;
 
 	vector<shared_ptr<HybridMedLDA> > pamedlda;
-	shared_ptr<Corpus> corpus;
 
 	bp::object numWord() const;
 	bp::object numLabel() const;

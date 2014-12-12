@@ -137,30 +137,6 @@ dep/fast:
 	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
 .PHONY : dep/fast
 
-src/Corpus.o: src/Corpus.cpp.o
-.PHONY : src/Corpus.o
-
-# target to build an object file
-src/Corpus.cpp.o:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Corpus.cpp.o
-.PHONY : src/Corpus.cpp.o
-
-src/Corpus.i: src/Corpus.cpp.i
-.PHONY : src/Corpus.i
-
-# target to preprocess a source file
-src/Corpus.cpp.i:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Corpus.cpp.i
-.PHONY : src/Corpus.cpp.i
-
-src/Corpus.s: src/Corpus.cpp.s
-.PHONY : src/Corpus.s
-
-# target to generate assembly for a file
-src/Corpus.cpp.s:
-	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/Corpus.cpp.s
-.PHONY : src/Corpus.cpp.s
-
 src/Document.o: src/Document.cpp.o
 .PHONY : src/Document.o
 
@@ -508,9 +484,6 @@ help:
 	@echo "... dep"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... src/Corpus.o"
-	@echo "... src/Corpus.i"
-	@echo "... src/Corpus.s"
 	@echo "... src/Document.o"
 	@echo "... src/Document.i"
 	@echo "... src/Document.s"

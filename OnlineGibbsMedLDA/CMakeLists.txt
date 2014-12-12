@@ -37,7 +37,6 @@ ADD_LIBRARY(bayespagibbs SHARED
     src/ap.cpp
     src/cholesky.cpp
     src/cokus.cpp
-    src/Corpus.cpp
     src/HybridMedLDA.cpp
     src/InverseGaussian.cpp
     src/Mapper.cpp
