@@ -22,23 +22,23 @@ using namespace stl;
 
 template<class T>
 vec<T> makeVector(boost::python::list array) {
-  auto vector = stl::makeVector<T>();
+  vec<T> vector;
   for(size_t i = 0; i < boost::python::len(array); i++) {
-    vector->push_back(boost::python::extract<T>(array[i]));
+    vector.push_back(boost::python::extract<T>(array[i]));
   }
   return vector;
 }
 
 template<class T>
 vec2D<T> makeVector2D(boost::python::list array) {
-  auto vector2D = stl::makeVector2D<T>();
+  vec2D<T> vector2D;
   for(size_t i = 0; i < boost::python::len(array); i++) {
     boost::python::list row = boost::python::extract<boost::python::list>(array[i]);
     std::vector<T> new_row;
     for(size_t j = 0; j < boost::python::len(array[i]); j++) {
       new_row.push_back(boost::python::extract<T>(row[i]));
     }
-    vector2D->push_back(new_row);
+    vector2D.push_back(new_row);
   }
   return vector2D;
 }

@@ -119,7 +119,8 @@ static void vecdivs( double* veca, double x, int spaceK) {
 }
 
 /* compute sum(veca.*vecb) */
-static double dotprod( double* veca, double* vecb, int spaceK) {
+template<class T>
+static double dotprod(T veca, T vecb, int spaceK) {
 	double res = 0;
 	for( int k = 0; k < spaceK; k++) {
 		res += veca[k]*vecb[k];
@@ -252,7 +253,8 @@ static bool choleskydec(double **A, double **res, const int &n, bool isupper)
 }
 
 /* the inverse of a matrix. */
-static void inverse_cholydec(double **A, double **res, double **lowerTriangle, const int &n)
+template<class T>
+static void inverse_cholydec(T A, T res, T lowerTriangle, const int &n)
 {
     ap::real_2d_array a;
     a.setbounds(0, n-1, 0, n-1);
@@ -269,7 +271,7 @@ static void inverse_cholydec(double **A, double **res, double **lowerTriangle, c
 		// get cholesky decomposition result.
 		double *dPtr = NULL;
 		for ( int i=0; i<n; i++ ) {
-			dPtr = lowerTriangle[i];
+			dPtr = &lowerTriangle[i][0];
 			for ( int j=0; j<=i; j++ ) {
 				dPtr[j] = a(j, i);
 			}

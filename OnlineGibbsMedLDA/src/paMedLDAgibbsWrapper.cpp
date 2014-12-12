@@ -58,7 +58,7 @@ bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::pyth
   for(int ci = 0; ci < num_category; ci++) threads[ci].join();  
   double acc = 0;
   bp::list ret;
-  for(size_t d = 0; d < labels->size(); d++) {
+  for(size_t d = 0; d < labels.size(); d++) {
     int output = 0;
     double confidence = 0-INFINITY;
     for( int ci = 0; ci < num_category; ci++) {
@@ -68,11 +68,11 @@ bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::pyth
       }
     }
     ret.append(output);
-    if(output == (*labels)[d]) {
+    if(output == labels[d]) {
       acc++;
     }
   }
-  m_test_acc = (double)acc/(double)labels->size();
+  m_test_acc = (double)acc/(double)labels.size();
   return ret;
 }
 
@@ -159,8 +159,8 @@ inline size_t paMedLDAgibbsWrapper::_numLabel() const {
 //////////// private methods /////////////////////////
 pair<vec2D<int>, vec<int> > 
 paMedLDAgibbsWrapper::filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C) {
-  auto ret = makeVector2D<int>();
-  auto new_label = makeVector<int>();
+  auto ret = vec2D<int>();
+  vec<int> new_label;
   for(size_t ni = 0; ni < bp::len(batch); ni++) {
     bp::list ex = bp::extract<bp::list>(batch[ni]);
     size_t y = (size_t)bp::extract<int>(label[ni]);
@@ -172,8 +172,8 @@ paMedLDAgibbsWrapper::filterWordAndLabel(bp::list batch, bp::list label, size_t 
         row.push_back(token);
       }
     }
-    ret->push_back(row);
-    new_label->push_back(y);
+    ret.push_back(row);
+    new_label.push_back(y);
   }
   return make_pair(ret, new_label);
 }

@@ -122,45 +122,44 @@ void HybridMedLDA::init() {
     for(int w = 0; w < testData->W[i]; w++) testData->data[i][w] = corpus->testData[i]->words[w];
   }
   
-  /* stat init*/
-  eta_icov = new double*[K];
-  eta_cov = new double*[K];
-  prev_eta_icov = new double*[K];
-  eta_pmean = new double[K];
-  eta_mean = new double[K];
-  stat_pmean = new double[K];
-  prev_eta_pmean = new double[K];
-  memset(stat_pmean, 0, sizeof(double)*K);
-  memset(eta_pmean, 0, sizeof(double)*K);
-  memset(eta_mean, 0, sizeof(double)*K);
-  stat_icov = new double*[K];
+  /* init global variables and sufficient stats */
+  gamma = vec2D<double>(K);
+  prev_gamma = vec2D<double>(K); 
+  gammasum = vec<double>(K, 0);
   for(int k = 0; k < K; k++) {
-    prev_eta_icov[k] = new double[K];
-    eta_cov[k] = new double[K];
-    eta_icov[k] = new double[K];
-    memset(eta_icov[k], 0, sizeof(double)*K);
-    eta_icov[k][k] = 1/(v*v);
-    stat_icov[k] = new double[K];
-    memset(stat_icov[k], 0, sizeof(double)*K);
+    gamma[k].resize(T, 0);
+    prev_gamma[k].resize(T, 0);
   }
-  gamma = new double*[K];
-  prev_gamma = new double*[K];
-  gammasum = new double[K];
+
+  eta_icov = vec2D<double>(K);
+  eta_cov = vec2D<double>(K);
+  prev_eta_icov = vec2D<double>(K);
+  stat_icov = vec2D<double>(K);
+
   for(int k = 0; k < K; k++) {
-    gamma[k] = new double[T];
-    prev_gamma[k] = new double[T];
+    eta_icov[k].resize(K, 0);
+    eta_icov[k][k] = 1 / (v * v);
+    eta_cov[k].resize(K, 0);
+    eta_cov[k][k] = v * v;
+    prev_eta_icov[k].resize(K, 0);
+    stat_icov[k].resize(K, 0);
   }
-  stat_phi = new double*[K];
+
+  eta_pmean = vec<double>(K, 0);
+  eta_mean = vec<double>(K, 0);
+  stat_pmean = vec<double>(K, 0);
+  prev_eta_pmean = vec<double>(K, 0);
+
+  stat_phi = vec2D<double>(K);
+  for(int i = 0; i < K; i++) 
+    stat_phi[i].resize(T, 0);
+
   prev_gamma_list_k = new int[K*T];
   prev_gamma_list_t = new int[K*T];
   prev_gamma_list_end = -1;
   stat_phi_list_k = new int[K*T];
   stat_phi_list_t = new int[K*T];
   stat_phi_list_end = -1;
-  for(int i = 0; i < K; i++) {
-    stat_phi[i] = new double[T];
-    memset(stat_phi[i], 0, sizeof(double)*T);
-  }
   pos_ratio = (double)train_pos/(double)(train_pos+train_neg);
   
   commit_points.clear();
@@ -168,25 +167,9 @@ void HybridMedLDA::init() {
   delete[] idx;
   
   train_time = 0;
-  /* Initialization */
+
+  /* init random source */
   invgSampler->reset(1, 1);
-  for(int k1 = 0; k1 < K; k1++) {
-    for(int k2 = 0; k2 < K; k2++) {
-      if(k1 == k2) {
-        eta_icov[k1][k2] = 1/v/v;
-        eta_cov[k1][k2] = v*v;
-      }else{
-        eta_icov[k1][k2] = eta_cov[k1][k2] = 0;
-      }
-    }
-  }
-  memset(eta_mean, 0, sizeof(double)*K);
-  for(int k = 0; k < K; k++) {
-    gammasum[k] = 0;
-    for(int t = 0; t < T; t++) {
-      gamma[k][t] = 0;
-    }
-  }
   
   batchIdx = 0;
 }
@@ -213,36 +196,8 @@ HybridMedLDA::~HybridMedLDA() {
   delete[] testData->data;
   
   /* clean stat */
-  for(int i = 0; i < K; i++) {
-    delete[] gamma[i];
-    delete[] prev_gamma[i];
-    delete[] eta_icov[i];
-    delete[] eta_cov[i];
-    delete[] prev_eta_icov[i];
-    delete[] stat_icov[i];
-    delete[] stat_phi[i];
-  }
-  delete[] stat_phi;
   delete[] stat_phi_list_k;
   delete[] stat_phi_list_t;
-  delete[] gamma;
-  delete[] prev_gamma;
-  delete[] gammasum;
-  delete[] eta_icov;
-  delete[] eta_cov;
-  delete[] stat_icov;
-  delete[] stat_pmean;
-  delete[] eta_pmean;
-  delete[] eta_mean;
-  delete[] prev_eta_pmean;
-  delete[] prev_eta_icov;
-  for(int i = 0; i < samples->size(); i++) {
-    Sample* sample = samples->back();
-    delete sample;
-    samples->pop_back();
-  }
-  delete samples;
-  delete sampleZs;
   delete invgSampler;
   delete mvGaussianSampler;
   delete data;
@@ -407,10 +362,10 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
 
   /* setting basic parameters for convenience. */
   if(reset) {
-    memset(stat_pmean, 0, sizeof(double)*K);
+    memset(&stat_pmean[0], 0, sizeof(double)*K);
     for(int k1 = 0; k1 < K; k1++) {
-      memset(stat_icov[k1], 0, sizeof(double)*K);
-      memset(stat_phi[k1], 0, sizeof(double)*T);
+      memset(&stat_icov[k1][0], 0, sizeof(double)*K);
+      memset(&stat_phi[k1][0], 0, sizeof(double)*T);
     }
     stat_phi_list_end = -1;
   }
@@ -447,11 +402,11 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
 }
 
 void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
-  double** eta_lowertriangle = new double*[K];
-  for(int i = 0; i < K; i++) {
-    eta_lowertriangle[i] = new double[K];
-  }
-  // %%%%%%%%%%%% normalize eta, which is gaussian distribution.
+  vec2D<double> eta_lowertriangle(K);
+  for(int i = 0; i < K; i++) 
+    eta_lowertriangle[i].resize(K, 0);
+
+  /* normalize eta, which is gaussian distribution. */
   for(int k = 0; k < K; k++) {
     if(remove) eta_pmean[k] -= prev_eta_pmean[k];
     prev_eta_pmean[k] = stat_pmean[k]*data->D/(double)batchSize/(double)N;
@@ -464,7 +419,8 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
       eta_icov[k1][k2] += prev_eta_icov[k1][k2];
     }
   }
-  // %%%%%%%%%%%% update phi, which is dirichlet distribution.
+
+  /* update phi, which is dirichlet distribution. */
   if(remove) {
     for(int stat_i = 0; stat_i <= prev_gamma_list_end; stat_i++) {
       int k = prev_gamma_list_k[stat_i], t = prev_gamma_list_t[stat_i];
@@ -482,15 +438,12 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
     gamma[k][t] += prev_gamma[k][t];
     gammasum[k] += prev_gamma[k][t];
   }
-  // %%%%%%%%%%%% compute aux information.
+
+  /* compute aux information. */
   inverse_cholydec(eta_icov, eta_cov, eta_lowertriangle, K);
   for(int k = 0; k < K; k++) {
-    eta_mean[k] = dotprod(eta_cov[k], eta_pmean, K);
+    eta_mean[k] = dotprod(eta_cov[k], *eta_pmean, K);
   }
-  for(int i = 0; i < K; i++) {
-    delete[] eta_lowertriangle[i];
-  }
-  delete[] eta_lowertriangle;
 }
   
 
@@ -499,10 +452,10 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
   clock_t time_end;
 
   /* create data samples from raw batch */
-  int data_size = batch->size();
+  int data_size = batch.size();
   DataSample** data_sample = new DataSample*[data_size];
   for(int di = 0; di < data_size; di++) {
-    data_sample[di] = new DataSample((*batch)[di], (*label)[di]);
+    data_sample[di] = new DataSample(batch[di], label[di]);
   }
   CorpusData* data = new CorpusData(data_sample, data_size, this->category);
   SampleZ* iZ = new SampleZ(data->D, data->W);
@@ -550,10 +503,10 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
   Zbar_test.clear();
 
   /* parse data */
-  int data_size = batch->size();
+  int data_size = batch.size();
   vector<DataSample*> data_sample(data_size);
   for(int di = 0; di < data_size; di++) {
-    data_sample[di] = new DataSample((*batch)[di]);
+    data_sample[di] = new DataSample(batch[di]);
   }
   CorpusData* testData = new CorpusData(&data_sample[0], data_size, this->category);
   SampleZ* iZ_test = new SampleZ(testData->D, testData->W);

@@ -64,12 +64,13 @@ public:
   int batchSize, round; // round is the clock of online algo.
   bool lets_batch, lets_multic; // batch mode.
   
-  // stats.
-  double** gamma, **prev_gamma; // emperical sum(Od(k,t))
-  double* gammasum; // row sum of gamma.
-  double** eta_icov, **eta_cov, **prev_eta_icov;
-  double* eta_pmean, *eta_mean, *prev_eta_pmean; // mean of eta without transformation.
-  double **stat_phi, **stat_icov, *stat_pmean; // stat used in global update.
+  /* stats */
+  stl::vec2D<double> gamma, prev_gamma;			  // sufficient statistics.
+  stl::vec<double> gammasum;				  // sums of rows in gamma.
+  stl::vec2D<double> eta_icov, eta_cov, prev_eta_icov;    // weight covariance matrix.
+  stl::vec<double> eta_pmean, eta_mean, prev_eta_pmean;   // mean of eta without transformation.
+  stl::vec2D<double> stat_phi, stat_icov;                 // stat used in global update.
+  stl::vec<double> stat_pmean;                            // stat used in global update.
   vector<vector<double> > Zbar_test;
   vector<vector<double> > Ckt_test;
   vector<double> Ckt_test_sum;

@@ -12,7 +12,7 @@ void test_makeVector() {
   list.append(3.0);
   
   auto vector = makeVector<double>(list);
-  for(auto x : *vector) {
+  for(auto x : vector) {
     cout << x << " ";
   }
   cout << endl;
@@ -28,7 +28,7 @@ void test_makeVector2D() {
   list.append(list2);
   
   auto vector2D = makeVector2D<double>(list);
-  for(auto& vector : *vector2D) {
+  for(auto& vector : vector2D) {
     for(auto& x : vector) {
       cout << x << " ";
     }
