@@ -55,6 +55,36 @@ def acc_test():
   print pamedlda.infer(test_docs, test_labels, 100)
   print 'test accuracy = ', pamedlda.testAcc()
 
+# gather topic representation along the time axis.
+def evolving_topic():
+  batch_size = 512
+  (docs, labels) = read_gml('../../data/20ng_train.gml')
+  (test_docs, test_labels) = read_gml('../../data/20ng_test.gml')
+  allind = set(range(len(docs)))
+  topics = [] 
+  num_docs = []
+  while len(allind) > 0:
+    if len(allind) >= batchsize:
+      ind = npr.choice(list(allind), batch_size, replace=False)
+    else:
+      ind = list(allind)
+    allind -= set(ind)
+    batch_doc = [docs[i] for i in ind]
+    batch_label = [labels[i] for i in ind]
+    pamedlda.train(batch_doc, batch_label)
+    pamedlda.infer(test_docs, test_labels, 100)
+    num_docs += [len(docs) - len(allind)]
+    print 'processed %d docs, test accuracy = ' % (num_docs[-1]), pamedlda.testAcc()
+    topics_now = []
+    for ci in range(pamedlda.numLabel()):
+      topics_now += [np.array(pamedlda.topicDistOfInference(ci))]
+    topics += [topics_now]
+  sio.savemat('topics.mat', {'topics': topics, 'labels':test_labels, 'docs':test_docs})
+  print 'finished'
+
+      
+
+
 # visualize topic dist.
 def visualize_topic(category_i):
   dir_name = 'visualize_dist_paMedLDAgibbs_%d'%(category_i)
@@ -110,8 +140,8 @@ def visualize_topic(category_i):
   
 if __name__ == '__main__':
   # visualize_topic(0)
-  acc_test()
-  # pamedlda.train([[1,2,3], [4,5,6]], [0, 1])
+  # acc_test()
+  evolving_topic()
 
 
 
