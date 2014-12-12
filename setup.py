@@ -1,11 +1,12 @@
 from distutils.core import setup, Extension
 
 dir_medlda = 'medlda/OnlineGibbsMedLDA/'
-pamedlda = Extension('pamedlda',
+pamedlda = Extension('libbayespagibbs',
                     define_macros = [('MAJOR_VERSION', '0'),
                                      ('MINOR_VERSION', '1')],
                     include_dirs = [dir_medlda + 'inc', dir_medlda + 'inc/utils'],
-                    libraries = ['boost_python'],
+                    library_dirs = ['/opt/local/lib/'],
+                    libraries = ['boost_python-mt'],
                     extra_compile_args=['-std=c++11', '-w'], 
                     sources = [dir_medlda + name for name in [
                                         "src/utils/ap.cpp",
@@ -17,6 +18,7 @@ pamedlda = Extension('pamedlda',
                                         "src/utils/objcokus.cpp",
                                         "src/utils/spdinverse.cpp",
                                         "src/utils/Document.cpp",
+                                        "src/utils/Sample.cpp", 
                                         "src/OnlineGibbsMedLDA.cpp",
                                         "src/OnlineGibbsMedLDAWrapper.cpp"
                                   ]])

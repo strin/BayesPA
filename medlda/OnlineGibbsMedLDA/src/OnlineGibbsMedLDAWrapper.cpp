@@ -5,8 +5,6 @@ using namespace std;
 
 paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config) 
 {
-  string train_file = bp::extract<string>(config["train_file"]);
-  string test_file = bp::extract<string>(config["test_file"]);
   this->_numLabel = bp::extract<int>(config["#label"]);
   this->_numWord = bp::extract<int>(config["#word"]);
 
@@ -25,6 +23,8 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
       pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
     if(config.has_key("beta"))
       pamedlda[ci]->beta0 = bp::extract<float>(config["beta"]);
+    if(config.has_key("v"))
+      pamedlda[ci]->v = bp::extract<float>(config["v"]);
     if(config.has_key("c"))
       pamedlda[ci]->c = bp::extract<float>(config["c"]);
     if(config.has_key("l"))

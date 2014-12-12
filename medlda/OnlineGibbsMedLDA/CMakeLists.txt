@@ -36,6 +36,7 @@ ENDIF()
 
 ADD_LIBRARY(bayespagibbs SHARED
   src/utils/ap.cpp
+  src/utils/Sample.cpp
   src/utils/cholesky.cpp
   src/utils/cokus.cpp
   src/utils/InverseGaussian.cpp
@@ -64,4 +65,4 @@ target_link_libraries(bayespaTest
   ${PYTHON_LIBRARIES}
 )
 
-# add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )
+add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )

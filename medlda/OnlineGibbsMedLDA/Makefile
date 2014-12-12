@@ -30,19 +30,22 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/local/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E remove -f
+RM = /opt/local/bin/cmake -E remove -f
+
+# Escaping for special characters.
+EQUALS = =
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/ccmake
+CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA
+CMAKE_SOURCE_DIR = "/Users/strin/Research/ML/BayesPA/code release/medlda/OnlineGibbsMedLDA"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA
+CMAKE_BINARY_DIR = "/Users/strin/Research/ML/BayesPA/code release/medlda/OnlineGibbsMedLDA"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +53,7 @@ CMAKE_BINARY_DIR = /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -60,7 +63,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -69,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/CMakeFiles /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/medlda/OnlineGibbsMedLDA/CMakeFiles" "/Users/strin/Research/ML/BayesPA/code release/medlda/OnlineGibbsMedLDA/CMakeFiles/progress.marks"
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/strin/Research/ML/BayesPA/code release/medlda/OnlineGibbsMedLDA/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -123,6 +126,19 @@ bayespagibbs: cmake_check_build_system
 bayespagibbs/fast:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/build
 .PHONY : bayespagibbs/fast
+
+#=============================================================================
+# Target rules for targets named dep
+
+# Build rule for target.
+dep: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dep
+.PHONY : dep
+
+# fast build rule for target.
+dep/fast:
+	$(MAKE) -f CMakeFiles/dep.dir/build.make CMakeFiles/dep.dir/build
+.PHONY : dep/fast
 
 src/OnlineGibbsMedLDA.o: src/OnlineGibbsMedLDA.cpp.o
 .PHONY : src/OnlineGibbsMedLDA.o
@@ -267,6 +283,30 @@ src/utils/Mapper.s: src/utils/Mapper.cpp.s
 src/utils/Mapper.cpp.s:
 	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/utils/Mapper.cpp.s
 .PHONY : src/utils/Mapper.cpp.s
+
+src/utils/Sample.o: src/utils/Sample.cpp.o
+.PHONY : src/utils/Sample.o
+
+# target to build an object file
+src/utils/Sample.cpp.o:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/utils/Sample.cpp.o
+.PHONY : src/utils/Sample.cpp.o
+
+src/utils/Sample.i: src/utils/Sample.cpp.i
+.PHONY : src/utils/Sample.i
+
+# target to preprocess a source file
+src/utils/Sample.cpp.i:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/utils/Sample.cpp.i
+.PHONY : src/utils/Sample.cpp.i
+
+src/utils/Sample.s: src/utils/Sample.cpp.s
+.PHONY : src/utils/Sample.s
+
+# target to generate assembly for a file
+src/utils/Sample.cpp.s:
+	$(MAKE) -f CMakeFiles/bayespagibbs.dir/build.make CMakeFiles/bayespagibbs.dir/src/utils/Sample.cpp.s
+.PHONY : src/utils/Sample.cpp.s
 
 src/utils/ap.o: src/utils/ap.cpp.o
 .PHONY : src/utils/ap.o
@@ -420,6 +460,7 @@ help:
 	@echo "... depend"
 	@echo "... bayespaTest"
 	@echo "... bayespagibbs"
+	@echo "... dep"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... src/OnlineGibbsMedLDA.o"
@@ -440,6 +481,9 @@ help:
 	@echo "... src/utils/Mapper.o"
 	@echo "... src/utils/Mapper.i"
 	@echo "... src/utils/Mapper.s"
+	@echo "... src/utils/Sample.o"
+	@echo "... src/utils/Sample.i"
+	@echo "... src/utils/Sample.s"
 	@echo "... src/utils/ap.o"
 	@echo "... src/utils/ap.i"
 	@echo "... src/utils/ap.s"

@@ -29,15 +29,14 @@ class BinaryclassTest(unittest.TestCase):
     m_K = 5
     me.batchsize = 64
     config = {  "#topic"      :  m_K, 
-                "train_file"    :  "../../../data/AtheismReligionMisc_Binary_train_nomalletstopwrd.gml",
-                "test_file"      :  "../../../data/AtheismReligionMisc_Binary_test_nomalletstopwrd.gml",
                 "dic_file"      :   "../../../data/dic.txt",
                 "epoch"        :   1}
-    (me.docs, me.labels, T1) = read_gml('../../../data/AtheismReligionMisc_Binary_train_nomalletstopwrd.gml')
-    (me.test_docs, me.test_labels, T2) = read_gml('../../../data/AtheismReligionMisc_Binary_test_nomalletstopwrd.gml')
+    (me.docs, me.labels, T1) = read_gml('../../../../data/AtheismReligionMisc_Binary_train_nomalletstopwrd.gml')
+    (me.test_docs, me.test_labels, T2) = read_gml('../../../../data/AtheismReligionMisc_Binary_test_nomalletstopwrd.gml')
     me.T = max(T1, T2)
     config['#label'] = 2
     config['#word'] = me.T
+    print me.T
     me.pamedlda = paMedLDAgibbs(config)
 
   def test_acc(me):
