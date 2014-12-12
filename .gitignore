@@ -4,4 +4,6 @@
 *.cmake
 *.make
 CMakeCache*
+*.pyc
+*.swp
 
