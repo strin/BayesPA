@@ -314,12 +314,10 @@ void HybridMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
       debug("error: word %d out of range [0, %d).\n", t, T);
     }
     prevZ->Cdk[i][prevZ->Z[i][j]]--; // exclude Zij.
-    Ckt_test[prevZ->Z[i][j]][t]--;
-    Ckt_test_sum[prevZ->Z[i][j]]--;
     int flagZ = -1, flag0 = -1;
     double cum = 0;
     for(int k = 0; k < K; k++) {
-      weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t]+Ckt_test[k][t])/(beta0*T+gammasum[k]+Ckt_test_sum[k]);
+      weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t])/(beta0*T+gammasum[k]);
       cum = weights[k];
       if(std::isnan(weights[k])) {
         debug("error: Z weights nan.\n");
@@ -335,8 +333,6 @@ void HybridMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
       prevZ->Z[i][j] = seli;
     }
     prevZ->Cdk[i][prevZ->Z[i][j]]++; // restore Cdk, Ckt.
-    Ckt_test[prevZ->Z[i][j]][t]++;
-    Ckt_test_sum[prevZ->Z[i][j]]++;
   }
   memset(prevZ->Zbar[i], 0, sizeof(double)*K);
   for(int j = 0; j < W[i]; j++) {
@@ -492,8 +488,6 @@ double HybridMedLDA::train(vec2D<int> batch, vec<int> label) {
 
 vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, int category) {
   /* pre-clearning */
-  Ckt_test.clear();
-  Ckt_test_sum.clear();
   Zbar_test.clear();
 
   /* parse data */
@@ -511,12 +505,6 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
     max_gibbs_iter = 2*num_test_sample;
   }
 
-  Ckt_test.resize(K);
-  Ckt_test_sum.resize(K, 0);
-  for(int k = 0; k < K; k++) {
-    Ckt_test[k].resize(T, 0);
-  }
-
   Zbar_test.resize(testData->D);
   iZ_test->Cdk = new double*[testData->D];
   for(int d = 0; d < testData->D; d++) {
@@ -528,8 +516,6 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
 
     for(int w = 0; w < testData->W[d]; w++) {
       iZ_test->Z[d][w] = cokus.randomMT()%K;
-      Ckt_test[iZ_test->Z[d][w]][testData->data[d][w]]++;
-      Ckt_test_sum[iZ_test->Z[d][w]]++;
       iZ_test->Cdk[d][iZ_test->Z[d][w]]++;
     }
   }

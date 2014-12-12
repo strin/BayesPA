@@ -69,8 +69,6 @@ public:
   stl::vec2D<double> stat_phi, stat_icov;                 // stat used in global update.
   stl::vec<double> stat_pmean;                            // stat used in global update.
   vector<vector<double> > Zbar_test;
-  vector<vector<double> > Ckt_test;
-  vector<double> Ckt_test_sum;
 
   stl::vec<int> stat_phi_list_k, stat_phi_list_t;		  // aux stats for sparse updates.
   stl::vec<int> prev_gamma_list_k, prev_gamma_list_t;         // aux stats for sparse updates.
