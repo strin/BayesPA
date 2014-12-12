@@ -1,4 +1,4 @@
-#include "paMedLDAgibbsWrapper.h"
+#include "OnlineGibbsMedLDAWrapper.h"
 
 using namespace pyutils;
 using namespace std;

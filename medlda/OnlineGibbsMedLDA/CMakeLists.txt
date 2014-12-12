@@ -2,8 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT (BayesPA)
 
 include_directories("inc")
+include_directories("inc/utils")
 add_subdirectory("src")
-add_subdirectory("src/utils")
 
 set(CMAKE_PREFIX_PATH /opt/local ${CMAKE_PREFIX_PATH}) 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules) 
@@ -18,7 +18,6 @@ message("Libs of Python: " ${PYTHON_LIBRARIES} )
 
 include_directories(
   "inc"
-  "inc/utils"
   ${Boost_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
 )
@@ -35,31 +34,34 @@ ELSE()
   MESSAGE(FATAL_ERROR "CMakeLists.txt has not been tested/written for your compiler.")
 ENDIF()
 
-ADD_LIBRARY(bayespa SHARED
-    src/Corpus.cpp
-    src/paMedLDAave.cpp
-	  src/paMedLDAaveWrapper.cpp
-    src/utils/ap.cpp
-    src/utils/cholesky.cpp
-    src/utils/InverseGaussian.cpp
-    src/utils/MVGaussian.cpp
-    src/utils/objcokus.cpp
-    src/utils/spdinverse.cpp
+ADD_LIBRARY(bayespagibbs SHARED
+  src/utils/ap.cpp
+  src/utils/cholesky.cpp
+  src/utils/cokus.cpp
+  src/utils/InverseGaussian.cpp
+  src/utils/Mapper.cpp
+  src/utils/MVGaussian.cpp
+  src/utils/objcokus.cpp
+  src/utils/spdinverse.cpp
+  src/utils/Document.cpp
+  src/OnlineGibbsMedLDA.cpp
+  src/OnlineGibbsMedLDAWrapper.cpp
 )
 
-target_link_libraries(bayespa
+target_link_libraries(bayespagibbs
   ${LIBS}
   ${Boost_LIBRARIES}
   ${PYTHON_LIBRARIES}
 )
 
+ADD_EXECUTABLE(bayespaTest 
+  test/test_pyutils.cpp
+)
 
-#target_link_libraries(test
-#  bayespa
-#  ${LIBS}
-#  ${Boost_LIBRARIES}
-#  ${PYTHON_LIBRARIES}
-#)
+target_link_libraries(bayespaTest
+  ${LIBS}
+  ${Boost_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+)
 
-
-add_custom_target(dep ALL COMMAND mv libbayespa.dylib libbayespa.so )
+# add_custom_target(dep ALL COMMAND mv libbayespagibbs.dylib libbayespagibbs.so )
