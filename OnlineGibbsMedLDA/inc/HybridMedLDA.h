@@ -39,9 +39,7 @@ public:
   void normalize_Phi_Eta(int N, bool remove);
   void draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt);
   void computeZbar(CorpusData* data, SampleZ* Z, int batchIdx);
-  double computeCostFunction(SampleZ* z, CorpusData* dt, int batchIdx, int batchSize);
   double computeDiscriFunc(CorpusData* dt, int di, Sample* sample, SampleZ* Z, double norm);
-  int eject_sample(CorpusData* dt, SampleZ* Z, int someround); // cancel the effect of mini-batch at some round.
   
   // train the model.
   void init();
@@ -61,7 +59,6 @@ public:
   // training and testing data.
   CorpusData *data, *testData;
   // training data param for convenience.
-  int batchSize, round; // round is the clock of online algo.
   bool lets_batch, lets_multic; // batch mode.
   
   /* stats */
@@ -75,8 +72,8 @@ public:
   vector<vector<double> > Ckt_test;
   vector<double> Ckt_test_sum;
 
-  int *stat_phi_list_k, *stat_phi_list_t, stat_phi_list_end; // aux stat for sparse update.
-  int *prev_gamma_list_k, *prev_gamma_list_t, prev_gamma_list_end;
+  stl::vec<int> stat_phi_list_k, stat_phi_list_t;		  // aux stats for sparse updates.
+  stl::vec<int> prev_gamma_list_k, prev_gamma_list_t;         // aux stats for sparse updates.
   
   // experiment parameters.
   double alpha0, beta0, train_time;

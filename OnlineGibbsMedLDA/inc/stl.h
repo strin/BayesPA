@@ -40,6 +40,10 @@ public:
   size_t size() const {
     return this->data->size();
   }
+
+  void clear() {
+    this->data->clear();
+  }
   
   void push_back(const T& val) {
     this->data->push_back(val);
@@ -97,6 +101,10 @@ public:
 
   size_t size() const {
     return this->data->size();
+  }
+
+  void clear() {
+    this->data->clear();
   }
 
   void push_back(const std::vector<T>& val) {

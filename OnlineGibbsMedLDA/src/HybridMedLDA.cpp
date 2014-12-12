@@ -30,7 +30,6 @@ HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
   testData->D              = (int)corpus->testDataSize;
   // key parameters.
   K                  = 5; // number of topics.
-  batchSize              = data->D;   // mini-batch size.
   epoch                = 1;     // number of scans of the entire corpus.
   I                  = 2;
   J                  = 2;   // Z repeated sample size.
@@ -57,13 +56,6 @@ HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
 }
 
 void HybridMedLDA::init() {
-  /* sampling setting */
-  maxSampleN              = 1;
-  if(lets_commit) {
-    maxBurninN            = commit_point_spacing*commit_point_n;
-  }else{
-    maxBurninN            = epoch*data->D/batchSize+1;
-  }
     
   /* data init*/
   data->W                = new int[data->D];
@@ -154,12 +146,11 @@ void HybridMedLDA::init() {
   for(int i = 0; i < K; i++) 
     stat_phi[i].resize(T, 0);
 
-  prev_gamma_list_k = new int[K*T];
-  prev_gamma_list_t = new int[K*T];
-  prev_gamma_list_end = -1;
-  stat_phi_list_k = new int[K*T];
-  stat_phi_list_t = new int[K*T];
-  stat_phi_list_end = -1;
+  prev_gamma_list_k = vec<int>();
+  prev_gamma_list_t = vec<int>();
+  stat_phi_list_k = vec<int>();
+  stat_phi_list_t = vec<int>();
+
   pos_ratio = (double)train_pos/(double)(train_pos+train_neg);
   
   commit_points.clear();
@@ -196,8 +187,6 @@ HybridMedLDA::~HybridMedLDA() {
   delete[] testData->data;
   
   /* clean stat */
-  delete[] stat_phi_list_k;
-  delete[] stat_phi_list_t;
   delete invgSampler;
   delete mvGaussianSampler;
   delete data;
@@ -367,7 +356,8 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
       memset(&stat_icov[k1][0], 0, sizeof(double)*K);
       memset(&stat_phi[k1][0], 0, sizeof(double)*T);
     }
-    stat_phi_list_end = -1;
+    stat_phi_list_k.clear();
+    stat_phi_list_t.clear();
   }
 
   /* update eta, which is gaussian distribution. */
@@ -392,9 +382,8 @@ void HybridMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
     for(int i = 0; i < dt->W[d]; i++) {
       int k = prevZ->Z[d][i], t = dt->data[d][i];
       if(stat_phi[k][t] == 0) {
-        stat_phi_list_end++;
-        stat_phi_list_k[stat_phi_list_end] = k;
-        stat_phi_list_t[stat_phi_list_end] = t;
+        stat_phi_list_k.push_back(k);
+        stat_phi_list_t.push_back(t);
       }
       stat_phi[k][t]++;
     }
@@ -409,32 +398,37 @@ void HybridMedLDA::normalize_Phi_Eta(int N, bool remove) {
   /* normalize eta, which is gaussian distribution. */
   for(int k = 0; k < K; k++) {
     if(remove) eta_pmean[k] -= prev_eta_pmean[k];
-    prev_eta_pmean[k] = stat_pmean[k]*data->D/(double)batchSize/(double)N;
+    prev_eta_pmean[k] = stat_pmean[k] / (double)N;
     eta_pmean[k] += prev_eta_pmean[k];
   }
   for(int k1 = 0; k1 < K; k1++) {
     for(int k2 = 0; k2 < K; k2++) {
       if(remove) eta_icov[k1][k2] -= prev_eta_icov[k1][k2];
-      prev_eta_icov[k1][k2] = stat_icov[k1][k2]*data->D/(double)batchSize/(double)N;
+      prev_eta_icov[k1][k2] = stat_icov[k1][k2] / (double)N;
       eta_icov[k1][k2] += prev_eta_icov[k1][k2];
     }
   }
 
   /* update phi, which is dirichlet distribution. */
   if(remove) {
-    for(int stat_i = 0; stat_i <= prev_gamma_list_end; stat_i++) {
+    for(size_t stat_i = 0; stat_i < prev_gamma_list_k.size(); stat_i++) {
       int k = prev_gamma_list_k[stat_i], t = prev_gamma_list_t[stat_i];
       gamma[k][t] -= prev_gamma[k][t];
       gammasum[k] -= prev_gamma[k][t];
     }
   }
-  prev_gamma_list_end = -1;
-  for(int stat_i = 0; stat_i <= stat_phi_list_end; stat_i++) {
+
+  prev_gamma_list_k.clear();
+  prev_gamma_list_t.clear();
+
+  for(size_t stat_i = 0; stat_i < stat_phi_list_k.size(); stat_i++) {
     int k = stat_phi_list_k[stat_i], t = stat_phi_list_t[stat_i];
-    prev_gamma[k][t] = stat_phi[k][t]*data->D/(double)batchSize/(double)N;
-    prev_gamma_list_end++;
-    prev_gamma_list_k[prev_gamma_list_end] = k;
-    prev_gamma_list_t[prev_gamma_list_end] = t;
+
+    prev_gamma[k][t] = stat_phi[k][t] / (double)N;
+
+    prev_gamma_list_k.push_back(k);
+    prev_gamma_list_t.push_back(t);
+
     gamma[k][t] += prev_gamma[k][t];
     gammasum[k] += prev_gamma[k][t];
   }
@@ -577,92 +571,6 @@ vector<double> HybridMedLDA::inference(vec2D<int> batch, int num_test_sample, in
   return my;
 }
 
-double HybridMedLDA::computeCostFunction(SampleZ *z, CorpusData *dt, int batchIdx, int batchSize) {
-  double cost = 0;
-  
-  /* KL[q(\theta) || q_t(\theta)] */
-  double* thetavar[batchSize], thetavarsum[batchSize];
-  for(int d = 0; d < batchSize; d++) thetavar[d] = new double[K];
-  memset(thetavarsum, 0, sizeof(double)*batchSize);
-  for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
-    int d = dd%dt->D;
-    double* thetavar_d = thetavar[dd-batchIdx];
-    double& thetavarsum_d = thetavarsum[dd-batchIdx];
-    for(int k = 0; k < K; k++) {
-      thetavar_d[k] = alpha0+z->Cdk[d][k];
-      thetavarsum_d += alpha0+z->Cdk[d][k];
-    }
-    for(int k = 0; k < K; k++) {
-      thetavar_d[k] = digamma(thetavar_d[k])-digamma(thetavarsum_d);
-      cost += z->Cdk[d][k]*thetavar_d[k];
-    }
-    cost += gammaln(K*alpha0)-gammaln(K*alpha0+dt->W[d]);
-    for(int k = 0; k < K; k++) {
-      cost += gammaln(alpha0+z->Cdk[d][k])-gammaln(alpha0);
-    }
-  }
-  for(int d = 0; d < batchSize; d++) delete thetavar[d];
-  
-  /* KL(q(\Phi) || q_t(\Phi)) */
-  for(int k = 0; k < K; k++) {
-    double prev_gamma_sum = gammasum[k];
-    for(int t = 0; t < T; t++) {
-      cost += prev_gamma[k][t]*(digamma(beta0+gamma[k][t])-digamma(beta0*T+gammasum[k]));
-      cost += gammaln(beta0+gamma[k][t])-gammaln(beta0+gamma[k][t]-prev_gamma[k][t]);
-      prev_gamma_sum -= gamma[k][t];
-    }
-    cost += gammaln(beta0*T+prev_gamma_sum)-gammaln(beta0*T+gammasum[k]);
-  }
-  
-  /* KL(q(w) || q_t(w)) */
-  double* eta_icov0[K], *eta_cov0[K], *eta_lowertriangle[K];
-  for(int k = 0; k < K; k++) {
-    eta_icov0[k] = new double[K];
-    eta_cov0[k] = new double[K];
-    eta_lowertriangle[k] = new double[K];
-  }
-  double eta_pmean0[K], eta_mean0[K];
-  for(int k1 = 0; k1 < K; k1++) {
-    eta_pmean0[k1] = eta_pmean[k1]-prev_eta_pmean[k1];
-    for(int k2 = 0; k2 < K; k2++) {
-      eta_icov0[k1][k2] = eta_icov[k1][k2]-prev_eta_icov[k1][k2];
-    }
-  }
-  inverse_cholydec(eta_icov0, eta_cov0, eta_lowertriangle, K);
-  for(int k = 0; k < K; k++) {
-    eta_mean0[k] = dotprod(eta_cov0[k], eta_pmean0, K);
-  }
-  for(int k = 0; k < K; k++) {
-    for(int j = 0; j < K; j++) {
-      cost += eta_icov[k][j]*eta_cov0[j][k]+(eta_mean[k]-eta_mean0[k])*eta_icov[k][j]*(eta_mean[j]-eta_mean0[j]);
-    }
-  }
-  cost -= K;
-  for(int k = 0; k < K; k++) {
-    delete[] eta_icov0[k];
-    delete[] eta_cov0[k];
-    delete[] eta_lowertriangle[k];
-  }
-  /*likelihood p(X_t | Z_t, \phi) */
-  for(int k = 0; k < K; k++) {
-    for(int t = 0; t < T; t++) {
-      cost -= prev_gamma[k][t]*(digamma(gamma[k][t])-digamma(gammasum[k]));
-    }
-  }
-  
-  /*pseudo-likelihood psi(Y_t, \lambdav_t | Z_t, w) */
-  for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
-    int d = dd%dt->D;
-    double discri = 0;
-    for(int k = 0; k < K; k++) {
-      discri += eta_mean[k]*z->Cdk[d][k]/(double)dt->W[d];
-    }
-    cost += 0-1/2*log(z->invlambda[d]/2/M_PI)+1/2*z->invlambda[d]
-                  *(1/z->invlambda[d]+c*discri)
-                  *(1/z->invlambda[d]+c*discri);
-  }
-  return cost;
-}
 
 //////////////////////////////////////////////////////////////////////
 ///////////// private methods ////////////////////////////////////////

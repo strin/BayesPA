@@ -27,7 +27,6 @@ class BinaryclassTest(unittest.TestCase):
     m_K = 5
     me.batchsize = 64
     config = {  "num_topic"      :  m_K, 
-                "batchsize"      :  me.batchsize,
                 "alpha"        :  0.5,
                 "beta"        :  0.45,
                 "c"          :  1,

@@ -13,7 +13,6 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
   for(int ci = 0; ci < corpus->newsgroupN; ci++) {
     pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(&*corpus, ci));
     pamedlda[ci]->K = bp::extract<int>(config["num_topic"]);
-    pamedlda[ci]->batchSize = bp::extract<int>(config["batchsize"]);
     pamedlda[ci]->lets_multic = true;
     pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
     pamedlda[ci]->beta0 = bp::extract<float>(config["beta"]);
