@@ -39,10 +39,10 @@ RM = /usr/bin/cmake -E remove -f
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/tianlin/BayesPA/OnlineGibbsMedLDA
+CMAKE_SOURCE_DIR = /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/tianlin/BayesPA/OnlineGibbsMedLDA
+CMAKE_BINARY_DIR = /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -69,14 +69,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/OnlineGibbsMedLDA/CMakeFiles /home/tianlin/BayesPA/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/OnlineGibbsMedLDA/CMakeFiles 0
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/CMakeFiles /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/src/CMakeFiles/progress.marks
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -85,17 +85,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -117,6 +117,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/tianlin/BayesPA/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/tianlin/BayesPA/medlda/OnlineGibbsMedLDA && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
