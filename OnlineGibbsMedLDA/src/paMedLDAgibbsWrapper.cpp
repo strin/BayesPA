@@ -10,16 +10,19 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
   corpus = shared_ptr<Corpus>(new Corpus());
   corpus->loadDataGML(train_file, test_file);
   pamedlda.resize(corpus->newsgroupN);
+  this->_numLabel = corpus->newsgroupN;
+  this->_numWord = corpus->T;
+
   for(int ci = 0; ci < corpus->newsgroupN; ci++) {
-    pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(&*corpus, ci));
+    pamedlda[ci] = shared_ptr<HybridMedLDA>(new HybridMedLDA(ci));
     pamedlda[ci]->K = bp::extract<int>(config["num_topic"]);
-    pamedlda[ci]->lets_multic = true;
     pamedlda[ci]->alpha0 = bp::extract<float>(config["alpha"]);
     pamedlda[ci]->beta0 = bp::extract<float>(config["beta"]);
     pamedlda[ci]->c = bp::extract<float>(config["c"]);
     pamedlda[ci]->l = bp::extract<float>(config["l"]);
     pamedlda[ci]->I = bp::extract<int>(config["I"]);
     pamedlda[ci]->J = bp::extract<int>(config["J"]);
+    pamedlda[ci]->T = corpus->T;
     pamedlda[ci]->init();
   }
 }
@@ -31,36 +34,34 @@ paMedLDAgibbsWrapper::~paMedLDAgibbsWrapper()
 
 
 void paMedLDAgibbsWrapper::train(bp::list batch, bp::list label) {
-  auto filtered = filterWordAndLabel(batch, label, _numWord(), _numLabel());
-  int num_category = pamedlda[0]->num_category;
-  vector<thread> threads(num_category);
-  for(int ci = 0; ci < num_category; ci++) {
+  auto filtered = filterWordAndLabel(batch, label, _numWord, _numLabel);
+  vector<thread> threads(_numLabel);
+  for(int ci = 0; ci < _numLabel; ci++) {
     threads[ci] = std::thread([&](int id)  {
       pamedlda[id]->train(filtered.first, filtered.second);
     }, ci);
   }
-  for(int ci = 0; ci < num_category; ci++) threads[ci].join();
+  for(int ci = 0; ci < _numLabel; ci++) threads[ci].join();
 }
 
 bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::python::object num_test_sample) {
-  int num_category = pamedlda[0]->num_category;
-  auto filtered = filterWordAndLabel(batch, label, _numWord(), _numLabel());
+  auto filtered = filterWordAndLabel(batch, label, _numWord, _numLabel);
   auto docs = filtered.first;
   auto labels = filtered.second;
-  vector<thread> threads(num_category);
-  vector<vector<double> > my(num_category);
-  for(int ci = 0; ci < num_category; ci++) {
+  vector<thread> threads(_numLabel);
+  vector<vector<double> > my(_numLabel);
+  for(int ci = 0; ci < _numLabel; ci++) {
     threads[ci] = std::thread([&](int id)  {
       my[id] = pamedlda[id]->inference(docs, bp::extract<int>(num_test_sample));    
     }, ci);
   }
-  for(int ci = 0; ci < num_category; ci++) threads[ci].join();  
+  for(int ci = 0; ci < _numLabel; ci++) threads[ci].join();  
   double acc = 0;
   bp::list ret;
   for(size_t d = 0; d < labels.size(); d++) {
     int output = 0;
     double confidence = 0-INFINITY;
-    for( int ci = 0; ci < num_category; ci++) {
+    for( int ci = 0; ci < _numLabel; ci++) {
       if(my[ci][d] > confidence) {
         output = ci;
         confidence = my[ci][d];
@@ -139,20 +140,13 @@ bp::list paMedLDAgibbsWrapper::labelOfInference() const {
 }
 
 inline bp::object paMedLDAgibbsWrapper::numWord() const {
-  return bp::object(_numWord());
+  return bp::object(_numWord);
 }
 
 inline bp::object paMedLDAgibbsWrapper::numLabel() const {
-  return bp::object(_numLabel());
+  return bp::object(_numLabel);
 }
 
-inline size_t paMedLDAgibbsWrapper::_numWord() const {
-  return pamedlda[0]->T;
-}
-
-inline size_t paMedLDAgibbsWrapper::_numLabel() const {
-  return pamedlda[0]->num_category;
-}
 
 ////////////////////////////////////////////////////////
 //////////// private methods /////////////////////////

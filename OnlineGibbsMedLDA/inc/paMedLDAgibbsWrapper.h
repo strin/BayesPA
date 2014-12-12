@@ -45,8 +45,8 @@ public:
 	vector<shared_ptr<HybridMedLDA> > pamedlda;
 	shared_ptr<Corpus> corpus;
 
-  bp::object numWord() const;
-  bp::object numLabel() const;
+	bp::object numWord() const;
+	bp::object numLabel() const;
 
 	double m_test_acc;
 
@@ -56,8 +56,8 @@ private:
   filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C);
 
   /* return number of words in the vocabulary */
-  size_t _numWord() const;
-  size_t _numLabel() const;
+  size_t _numWord;
+  size_t _numLabel;
 };
 
 

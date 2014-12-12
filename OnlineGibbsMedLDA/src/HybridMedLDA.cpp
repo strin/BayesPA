@@ -13,28 +13,15 @@
 using namespace stl;
 using namespace std;
 
-HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
-  this->corpus = corpus;
+HybridMedLDA::HybridMedLDA(int category) {
   this->category = category;
-  this->num_category = corpus->newsgroupN;
-  samples = new deque<Sample*>();
-  sampleZs = new deque<SampleZ*>();
   invgSampler = new InverseGaussian();
   mvGaussianSampler = new MVGaussian();
-  data = new CorpusData();
-  testData = new CorpusData();
   
-  // set basic parameters.
-  T                  = (int)corpus->T;
-  data->D                = (int)corpus->trainDataSize;
-  testData->D              = (int)corpus->testDataSize;
   // key parameters.
   K                  = 5; // number of topics.
-  epoch                = 1;     // number of scans of the entire corpus.
   I                  = 2;
   J                  = 2;   // Z repeated sample size.
-  u                  = 1;
-  tao                  = 1;
   J_burnin              = 0;
   l                  = 164;
   max_gibbs_iter            = 50;
@@ -45,75 +32,12 @@ HybridMedLDA::HybridMedLDA(Corpus* corpus, int category) {
   // other parameters.
   v                  = 1;
   c                  = 1;
-  lets_commit              = false;
-  lets_batch              = false;
-  lets_multic              = false;
-  mode_additive            = false;
-  commit_point_spacing        = 1;
   
   cokus.reloadMT();
   cokus.seedMT(time(NULL)+category);
 }
 
 void HybridMedLDA::init() {
-    
-  /* data init*/
-  data->W                = new int[data->D];
-  testData->W              = new int[testData->D];
-  data->data              = new int*[data->D];
-  data->y                = new int[data->D];
-  data->py              = new int[data->D];
-  data->my              = new double[data->D];
-  testData->data            = new int*[testData->D];
-  testData->y              = new int[testData->D];
-  testData->py            = new int[testData->D];
-  testData->my            = new double[testData->D];
-  int* idx = new int[data->D];
-  for(int i = 0; i < data->D; i++) idx[i] = i;
-  shuffleArray<int>(idx, data->D, cokus, data->D);
-  int train_pos = 0, train_neg = 0, test_pos = 0, test_neg = 0;
-  
-  for(int i = 0; i < data->D; i++) {
-    data->W[i] = corpus->trainData[idx[i]]->W;
-    if(category == -1)
-      data->y[i] = corpus->trainData[idx[i]]->label;
-    else{
-      if(corpus->multi_label) {
-        data->y[i] = -1;
-        for(int j = 0; j < corpus->trainData[idx[i]]->multi_label.size(); j++) {
-          if(category == corpus->trainData[idx[i]]->multi_label[j])
-            data->y[i] = 1;
-        }
-      }else
-        data->y[i] = corpus->trainData[idx[i]]->label == category ? 1 : -1;
-    }
-    train_neg += (1-data->y[i])/2;
-    train_pos += (1+data->y[i])/2;
-    data->py[i] = 0;
-    data->data[i] = new int[data->W[i]];
-    for(int w = 0; w < data->W[i]; w++) data->data[i][w] = corpus->trainData[idx[i]]->words[w];
-  }
-  for(int i = 0; i < testData->D; i++) {
-    testData->W[i] = corpus->testData[i]->W;
-    if(category == -1)
-      testData->y[i] = corpus->testData[i]->label;
-    else{
-      if(corpus->multi_label) {
-        testData->y[i] = -1;
-        for(int j = 0; j < corpus->testData[i]->multi_label.size(); j++) {
-          if(category == corpus->testData[i]->multi_label[j])
-            testData->y[i] = 1;
-        }
-      }else
-        testData->y[i] = corpus->testData[i]->label == category ? 1 : -1;
-    }
-    test_neg += (1-testData->y[i])/2;
-    test_pos += (1+testData->y[i])/2;
-    testData->py[i] = 0;
-    testData->data[i] = new int[testData->W[i]];
-    for(int w = 0; w < testData->W[i]; w++) testData->data[i][w] = corpus->testData[i]->words[w];
-  }
-  
   /* init global variables and sufficient stats */
   gamma = vec2D<double>(K);
   prev_gamma = vec2D<double>(K); 
@@ -151,47 +75,16 @@ void HybridMedLDA::init() {
   stat_phi_list_k = vec<int>();
   stat_phi_list_t = vec<int>();
 
-  pos_ratio = (double)train_pos/(double)(train_pos+train_neg);
-  
-  commit_points.clear();
-  /* cleaning */
-  delete[] idx;
-  
   train_time = 0;
 
   /* init random source */
   invgSampler->reset(1, 1);
-  
-  batchIdx = 0;
 }
 
 HybridMedLDA::~HybridMedLDA() {
-  if(!data->W) return; // not initialized.
-  
-  /* clean data */
-  delete[] data->W;
-  delete[] data->y;
-  delete[] data->py;
-  delete[] data->my;
-  for(int i = 0; i < data->D; i++) {
-    delete[] data->data[i];
-  }
-  for(int i = 0; i < testData->D; i++) {
-    delete[] testData->data[i];
-  }
-  delete[] data->data;
-  delete[] testData->W;
-  delete[] testData->y;
-  delete[] testData->py;
-  delete[] testData->my;
-  delete[] testData->data;
-  
   /* clean stat */
   delete invgSampler;
   delete mvGaussianSampler;
-  delete data;
-  delete testData;
-  commit_points.clear();
 }
 
 void HybridMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
@@ -261,13 +154,10 @@ void HybridMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
   int batchIdx = 0, batchSize = dt->D;
   for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
     int i = ii%dt->D;
-    if(data->W[i] == 0) {
-      debug("[error] document length 0\n");
-    }
     double discriFunc = 0;
     for(int k = 0; k < K; k++)
       discriFunc += eta_mean[k]*prevZ->Cdk[i][k]/(double)dt->W[i];
-    double zetad = l-data->y[i]*discriFunc;
+    double zetad = l-dt->y[i]*discriFunc;
     double bilinear = 0;
     for(int k1 = 0; k1 < K; k1++) {
       for(int k2 = 0; k2 < K; k2++) {
