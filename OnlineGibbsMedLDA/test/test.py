@@ -55,9 +55,9 @@ class BinaryclassTest(unittest.TestCase):
       batch_label = [labels[i] for i in ind]
       me.pamedlda.train(batch_doc, batch_label)
     print 'infer'
-    print pamedlda.infer(test_docs, test_labels, 100)
-    print 'test accuracy = ', pamedlda.testAcc()
-    assert(pamedlda.testAcc() > 0)
+    me.pamedlda.infer(test_docs, test_labels, 100)
+    print 'test accuracy = ', me.pamedlda.testAcc()
+    assert(me.pamedlda.testAcc() > 0.82)
 
 
 class MulticlassTest(unittest.TestCase):
