@@ -47,7 +47,7 @@ Installing Online MedLDA
 
 This release is for early adopters of this premature software. Please let us know if you have comments or suggestions. Contact: tianlinshi [AT] gmail.com 
 
-Online MedLDA is written in C++ 11, with a friendly python interface. It depends on gcc > 4.8, python (numpy) and boost::python.
+Online MedLDA is written in C++ 11, with a friendly python interface. It depends on gcc >= 4.8, python (numpy, distutils) and boost::python.
 To install, follow the instructions below.
 
 Dependencies (Ubuntu)
@@ -72,6 +72,16 @@ Installation
 ```
 sudo python setup.py install
 ```
+
+Citation
+========
+
+If you use online MedLDA in your work, please cite
+
+
+<i>Shi, T., & Zhu, J. (2014). Online Bayesian Passive-Aggressive Learning. In Proceedings of The 31st International Conference on Machine Learning (pp. 378-386).</i>
+
+
 
 
 License (GPL V3)
