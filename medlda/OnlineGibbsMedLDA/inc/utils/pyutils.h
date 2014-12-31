@@ -36,7 +36,7 @@ vec2D<T> makeVector2D(boost::python::list array) {
     boost::python::list row = boost::python::extract<boost::python::list>(array[i]);
     std::vector<T> new_row;
     for(size_t j = 0; j < boost::python::len(array[i]); j++) {
-      new_row.push_back(boost::python::extract<T>(row[i]));
+      new_row.push_back(boost::python::extract<T>(row[j]));
     }
     vector2D.push_back(new_row);
   }
