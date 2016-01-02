@@ -34,7 +34,7 @@ public:
 	~paMedLDAgibbsWrapper();
 
 	void train(bp::list batch, bp::list label);
-	bp::list infer(bp::list batch, bp::list label, bp::object num_test_sample);
+	bp::list infer(bp::list batch, bp::list label, bp::object num_test_sample, bool point_estimate);
 	bp::object timeElapsed() const;
 	bp::object testAcc() const {return bp::object(m_test_acc); }
 	bp::list topicMatrix(bp::object category_no) const;

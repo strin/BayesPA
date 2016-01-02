@@ -9,11 +9,19 @@ class BinaryclassTest(unittest.TestCase):
   def test_acc(me):
     pamedlda = medlda.OnlineGibbsMedLDA(num_topic = 5, labels = 2, words = 61188)
     pamedlda.train_with_gml('../data/binary_train.gml', 64)
-    (pred, ind, acc) = pamedlda.infer_with_gml('../data/binary_test.gml', 100)
+    (pred, ind, acc) = pamedlda.infer_with_gml('../data/binary_test.gml', 10)
     print 'pred = ', zip(ind, pred)
     print 'acc = ', acc
     assert(acc > 0.80)
-  
+
+  def test_acc_K80(me):
+    pamedlda = medlda.OnlineGibbsMedLDA(num_topic = 80, labels = 2, words = 61188, stepsize=25)
+    pamedlda.train_with_gml('../data/binary_train.gml', 32)
+    (pred, ind, acc) = pamedlda.infer_with_gml('../data/binary_test.gml', 10)
+    print 'pred = ', zip(ind, pred)
+    print 'acc = ', acc
+    assert(acc > 0.79)
+
 if __name__ == '__main__':
   unittest.main()
 

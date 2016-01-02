@@ -33,6 +33,8 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
       pamedlda[ci]->I = bp::extract<int>(config["I"]);
     if(config.has_key("J"))
       pamedlda[ci]->J = bp::extract<int>(config["J"]);
+    if(config.has_key("stepsize"))
+      pamedlda[ci]->stepsize = bp::extract<double>(config["stepsize"]);
   }
 }
 
@@ -52,7 +54,7 @@ void paMedLDAgibbsWrapper::train(bp::list batch, bp::list label) {
   for(int ci = 0; ci < _numLabel; ci++) threads[ci].join();
 }
 
-bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::python::object num_test_sample) {
+bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::python::object num_test_sample, bool point_estimate) {
   auto filtered = filterWordAndLabel(batch, label, _numWord, _numLabel);
   auto docs = filtered.first;
   auto labels = filtered.second;
@@ -60,6 +62,7 @@ bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::pyth
   vector<vector<double> > my(_numLabel);
   for(int ci = 0; ci < _numLabel; ci++) {
     threads[ci] = std::thread([&](int id)  {
+      pamedlda[id]->point_estimate_for_test = point_estimate;
       my[id] = pamedlda[id]->inference(docs, bp::extract<int>(num_test_sample));    
     }, ci);
   }

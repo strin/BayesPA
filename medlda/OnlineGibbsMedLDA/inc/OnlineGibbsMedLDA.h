@@ -30,7 +30,7 @@ public:
   
   /* sample local variables */
   void updateZ(SampleZ* prevZ, CorpusData* dt);
-  void draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt);
+  void draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt, vec2D<double>& Ckt, vec<double>& Ckt_sum);
 
   void computeZbar(CorpusData* data, SampleZ* Z, int di);
   double computeDiscriFunc(CorpusData* dt, int di, Sample* sample, SampleZ* Z, double norm);
@@ -58,6 +58,8 @@ public:
   double c;         // regularization parameter of hinge-loss.
   double l;         // margin parameter of hinge-loss.
   double v;         // prior weight \sim N(0, v^2).
+  double stepsize;  // weight for each data point.
+  bool point_estimate_for_test; // whether use point estimates at test time.
   
   /* stats */
   stl::vec2D<double> gamma, prev_gamma;			  // sufficient statistics.

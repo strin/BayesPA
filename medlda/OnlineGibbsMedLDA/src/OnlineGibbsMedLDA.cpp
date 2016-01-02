@@ -28,6 +28,8 @@ OnlineGibbsMedLDA::OnlineGibbsMedLDA(int category) {
   beta0              = 0.45;      
   v                  = 1;
   c                  = 1;
+  stepsize           = 1;
+  point_estimate_for_test = false;
 
 }
 
@@ -120,9 +122,9 @@ void OnlineGibbsMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
         else cul = weights[k-1];
         weights[k] = cul+(nextZ->Cdk[i][k]+alpha0)
               /* strategy 1 variational optimal distribution */
-              // *exp(digamma(beta0+gamma[k][word])-digamma(beta0*T+gammasum[k]))
+              *exp(digamma(beta0+gamma[k][word])-digamma(beta0*T+gammasum[k]))
               /* strategy 2 approximation that does not require digamma() */
-              *(beta0+gamma[k][word])/(beta0*T+gammasum[k])
+              // *(beta0+gamma[k][word])/(beta0*T+gammasum[k])
               *exp(B1*eta_mean[k]-B2*(A3+(A1*eta_mean[k]+A2[k])));
         if(std::isnan(weights[k])) {
           debug("error: Z weights nan.\n");
@@ -186,12 +188,12 @@ double OnlineGibbsMedLDA::computeDiscriFunc(CorpusData* dt, int di, Sample *samp
     return discriFunc/(double)norm;
 }
 
-void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
+void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt, vec2D<double>& Ckt, vec<double>& Ckt_sum) {
   // setting basic parameters for convenience.
   int *W = dt->W;
   double sel;
   int seli;
-  
+    
   // statistics Cdk.
   double weights[K]; // weights for importance sampling.
   for(int j = 0; j < W[i]; j++) {
@@ -200,10 +202,15 @@ void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
       debug("error: word %d out of range [0, %d).\n", t, T);
     }
     prevZ->Cdk[i][prevZ->Z[i][j]]--; // exclude Zij.
+    // update test topic stats matrix.
+    Ckt[prevZ->Z[i][j]][t]--;
+    Ckt_sum[prevZ->Z[i][j]]--;
     int flagZ = -1, flag0 = -1;
     double cum = 0;
     for(int k = 0; k < K; k++) {
-      weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)*(beta0+gamma[k][t])/(beta0*T+gammasum[k]);
+      weights[k] = cum+(prevZ->Cdk[i][k]+alpha0)
+          * (beta0 + gamma[k][t] + double(!point_estimate_for_test) * Ckt[k][t])
+          / (beta0 * T + gammasum[k] + double(!point_estimate_for_test) * Ckt_sum[k]);
       cum = weights[k];
       if(std::isnan(weights[k])) {
         debug("error: Z weights nan.\n");
@@ -219,6 +226,8 @@ void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt) {
       prevZ->Z[i][j] = seli;
     }
     prevZ->Cdk[i][prevZ->Z[i][j]]++; // restore Cdk, Ckt.
+    Ckt[prevZ->Z[i][j]][t]++;
+    Ckt_sum[prevZ->Z[i][j]]++;
   }
   memset(prevZ->Zbar[i], 0, sizeof(double)*K);
   for(int j = 0; j < W[i]; j++) {
@@ -280,13 +289,13 @@ void OnlineGibbsMedLDA::normalize_Phi_Eta(int N, bool remove) {
   /* normalize eta, which is gaussian distribution. */
   for(int k = 0; k < K; k++) {
     if(remove) eta_pmean[k] -= prev_eta_pmean[k];
-    prev_eta_pmean[k] = stat_pmean[k] / (double)N;
+    prev_eta_pmean[k] = stat_pmean[k] * stepsize / (double)N;
     eta_pmean[k] += prev_eta_pmean[k];
   }
   for(int k1 = 0; k1 < K; k1++) {
     for(int k2 = 0; k2 < K; k2++) {
       if(remove) eta_icov[k1][k2] -= prev_eta_icov[k1][k2];
-      prev_eta_icov[k1][k2] = stat_icov[k1][k2] / (double)N;
+      prev_eta_icov[k1][k2] = stat_icov[k1][k2] * stepsize / (double)N;
       eta_icov[k1][k2] += prev_eta_icov[k1][k2];
     }
   }
@@ -306,7 +315,7 @@ void OnlineGibbsMedLDA::normalize_Phi_Eta(int N, bool remove) {
   for(size_t stat_i = 0; stat_i < stat_phi_list_k.size(); stat_i++) {
     int k = stat_phi_list_k[stat_i], t = stat_phi_list_t[stat_i];
 
-    prev_gamma[k][t] = stat_phi[k][t] / (double)N;
+    prev_gamma[k][t] = stat_phi[k][t] * stepsize / (double)N;
 
     prev_gamma_list_k.push_back(k);
     prev_gamma_list_t.push_back(t);
@@ -334,6 +343,8 @@ double OnlineGibbsMedLDA::train(vec2D<int> batch, vec<int> label) {
     data_sample[di] = new DataSample(batch[di], label[di]);
   }
   CorpusData* data = new CorpusData(data_sample, data_size, this->category);
+
+  /* initialize the samples of latent variables */
   SampleZ* iZ = new SampleZ(data->D, data->W);
   iZ->Cdk = new double*[data->D];
   for(int i = 0; i < data->D; i++) {
@@ -392,6 +403,13 @@ vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sampl
     max_gibbs_iter = 2*num_test_sample;
   }
 
+  // initialize Ckt for test.
+  vec2D<double> Ckt_test = vec2D<double>(K);
+  for( int k = 0; k < K; k++) {
+    Ckt_test[k].resize(T, 0);
+  }
+  vec<double> Ckt_test_sum = vec<double>(K, 0);
+
   Zbar_test.resize(testData->D);
   iZ_test->Cdk = new double*[testData->D];
   for(int d = 0; d < testData->D; d++) {
@@ -404,6 +422,8 @@ vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sampl
     for(int w = 0; w < testData->W[d]; w++) {
       iZ_test->Z[d][w] = cokus.randomMT()%K;
       iZ_test->Cdk[d][iZ_test->Z[d][w]]++;
+      Ckt_test[iZ_test->Z[d][w]][testData->data[d][w]]++;
+      Ckt_test_sum[iZ_test->Z[d][w]]++;
     }
   }
 
@@ -411,7 +431,7 @@ vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sampl
   int zcount = 0;
   for(int it = 0; it < max_gibbs_iter; it++) {
     for(int d = 0; d < testData->D; d++) {
-      draw_Z_test(iZ_test, d, testData);
+      draw_Z_test(iZ_test, d, testData, Ckt_test, Ckt_test_sum);
     }
     if(it < testBurninN) continue;
     zcount++;
