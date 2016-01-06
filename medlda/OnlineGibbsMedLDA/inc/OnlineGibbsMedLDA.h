@@ -23,36 +23,40 @@
 
 class OnlineGibbsMedLDA {
 public:
-  OnlineGibbsMedLDA(int category = -1);
+  OnlineGibbsMedLDA(const vector<int>& category);
   void init();
 
   ~OnlineGibbsMedLDA();
   
   /* sample local variables */
-  void updateZ(SampleZ* prevZ, CorpusData* dt);
-  void draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt, vec2D<double>& Ckt, vec<double>& Ckt_sum);
+  void updateZ(stl::ptr<SampleZ> prevZ, stl::ptr<CorpusData> dt);
+  void draw_Z_test(ptr<SampleZ> prevZ, int i, stl::ptr<CorpusData> dt, vec2D<double>& Ckt, vec<double>& Ckt_sum);
 
-  void computeZbar(CorpusData* data, SampleZ* Z, int di);
-  double computeDiscriFunc(CorpusData* dt, int di, Sample* sample, SampleZ* Z, double norm);
+  void computeZbar(stl::ptr<CorpusData> data, ptr<SampleZ> Z, int di);
+  double computeDiscriFunc(stl::ptr<CorpusData> dt, int di, Sample* sample, ptr<SampleZ> Z, double norm);
 
-  void updateLambda( SampleZ* prevZ, CorpusData* dt);
+  void updateLambda( ptr<SampleZ> prevZ, stl::ptr<CorpusData> dt);
   
   /* update global stats */
-  void infer_Phi_Eta( SampleZ* prevZ, CorpusData* dt, bool reset);
+  void infer_Phi_Eta( ptr<SampleZ> prevZ, stl::ptr<CorpusData> dt, bool reset);
   void normalize_Phi_Eta(int N, bool remove);
 
   
   /* train the model */
-  double train(stl::vec2D<int> batch, stl::vec<int> label);
-  vector<double> inference(vec2D<int> batch, int num_test_sample = -1, int category = -1);
+  // deal with single label.
+  double train(const stl::vec2D<int>& batch, const stl::vec<int>& label);
+  // deal with multiple labels.
+  double train(const stl::vec2D<int>& batch, const stl::vec2D<int>& label);
+  vector<double> inference(vec2D<int> batch, int num_test_sample = -1);
   
   /* hyper parameters */
   int K;	    // number of topics.
   int T;	    // number of total words.
+  int num_category; // number of categories.
+  vector<int> category; // the categories this model tries to learn.
   int I;            // number of mean-field rounds for each BayesPA update.
   int J;            // number of Gibbs samples in the mean-field update of latent variables (substract J_burnin)
   int J_burnin;     // number of burn-in steps for Gibbs samples of latent variables.
-  int category;     // the target category this classifier is for. 
   double alpha0;    // prior of document topic distribution.
   double beta0;     // prior of dictionary.
   double c;         // regularization parameter of hinge-loss.

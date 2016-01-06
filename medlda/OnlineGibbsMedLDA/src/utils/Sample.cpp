@@ -29,7 +29,7 @@ Sample::~Sample() {
 	}
 }
 
-SampleZ::SampleZ(int D, int* W) {
+SampleZ::SampleZ(int D, stl::vec<int> W) {
 	Z = new int*[D];
 	Zbar = new double*[D];
 	Cdk = NULL;

@@ -13,13 +13,16 @@
 using namespace stl;
 using namespace std;
 
-OnlineGibbsMedLDA::OnlineGibbsMedLDA(int category) {
-  this->category = category;
+OnlineGibbsMedLDA::OnlineGibbsMedLDA(const vector<int>& category) {
   invgSampler = new InverseGaussian();
   mvGaussianSampler = new MVGaussian();
   
   /* parameters by default */
   K                  = 5;	    
+  T                  = 0;
+  num_category       = 2;
+  this->category = category;
+
   I                  = 3;           
   J                  = 1;	    
   J_burnin           = 0;          
@@ -30,7 +33,6 @@ OnlineGibbsMedLDA::OnlineGibbsMedLDA(int category) {
   c                  = 1;
   stepsize           = 1;
   point_estimate_for_test = false;
-
 }
 
 void OnlineGibbsMedLDA::init() {
@@ -75,7 +77,7 @@ void OnlineGibbsMedLDA::init() {
 
   /* init random source */
   cokus.reloadMT();
-  cokus.seedMT(time(NULL)+category);
+  cokus.seedMT(time(NULL));
   invgSampler->reset(1, 1);
 }
 
@@ -85,7 +87,7 @@ OnlineGibbsMedLDA::~OnlineGibbsMedLDA() {
   delete mvGaussianSampler;
 }
 
-void OnlineGibbsMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
+void OnlineGibbsMedLDA::updateZ(ptr<SampleZ> nextZ, ptr<CorpusData> dt) {
   double weights[K];                      // weights for importance sampling.
   double A1, A2[K], A3, B1, B2;          // replacements for fast computation.
   int word, N;
@@ -113,7 +115,7 @@ void OnlineGibbsMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
         A1 += 2*eta_mean[k]*nextZ->Cdk[i][k];
         A2[k] -= 2*eta_cov[k][nextZ->Z[i][j]];
       }
-      B1 = c*dt->y[i]*(1+c*l*nextZ->invlambda[i])*invN;
+      B1 = c*dt->y[i][category[0]]*(1+c*l*nextZ->invlambda[i])*invN;
       B2 = c*c*nextZ->invlambda[i]*0.5*invNx2;
       int flagZ = -1, flag0 = -1; // flag for abnomality.
       for(int k = 0; k < K; k++) {
@@ -148,14 +150,14 @@ void OnlineGibbsMedLDA::updateZ(SampleZ* nextZ, CorpusData* dt) {
   }
 }
 
-void OnlineGibbsMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
+void OnlineGibbsMedLDA::updateLambda(ptr<SampleZ> prevZ, ptr<CorpusData> dt) {
   int batchIdx = 0, batchSize = dt->D;
   for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
     int i = ii%dt->D;
     double discriFunc = 0;
     for(int k = 0; k < K; k++)
       discriFunc += eta_mean[k]*prevZ->Cdk[i][k]/(double)dt->W[i];
-    double zetad = l-dt->y[i]*discriFunc;
+    double zetad = l-dt->y[i][category[0]]*discriFunc;
     double bilinear = 0;
     for(int k1 = 0; k1 < K; k1++) {
       for(int k2 = 0; k2 < K; k2++) {
@@ -167,7 +169,7 @@ void OnlineGibbsMedLDA::updateLambda(SampleZ *prevZ, CorpusData *dt) {
   }
 }
 
-void OnlineGibbsMedLDA::computeZbar(CorpusData* data, SampleZ *Z, int di) {
+void OnlineGibbsMedLDA::computeZbar(ptr<CorpusData> data, ptr<SampleZ> Z, int di) {
   if(Z->Zbar[di] == 0)
     Z->Zbar[di] = new double[K];
   memset(Z->Zbar[di], 0, sizeof(double)*K);
@@ -177,7 +179,7 @@ void OnlineGibbsMedLDA::computeZbar(CorpusData* data, SampleZ *Z, int di) {
   for(int k = 0; k < K; k++) Z->Zbar[di][k] /= data->W[di]; // normalize.
 }
 
-double OnlineGibbsMedLDA::computeDiscriFunc(CorpusData* dt, int di, Sample *sample, SampleZ *Z, double norm) {
+double OnlineGibbsMedLDA::computeDiscriFunc(ptr<CorpusData> dt, int di, Sample *sample, ptr<SampleZ> Z, double norm) {
   double discriFunc = 0;
   for(int k = 0; k < K; k++) {
     discriFunc += sample->eta[k]*Z->Cdk[di][k];
@@ -188,9 +190,9 @@ double OnlineGibbsMedLDA::computeDiscriFunc(CorpusData* dt, int di, Sample *samp
     return discriFunc/(double)norm;
 }
 
-void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt, vec2D<double>& Ckt, vec<double>& Ckt_sum) {
+void OnlineGibbsMedLDA::draw_Z_test(ptr<SampleZ> prevZ, int i, ptr<CorpusData> dt, vec2D<double>& Ckt, vec<double>& Ckt_sum) {
   // setting basic parameters for convenience.
-  int *W = dt->W;
+  auto W = dt->W;
   double sel;
   int seli;
     
@@ -237,7 +239,7 @@ void OnlineGibbsMedLDA::draw_Z_test(SampleZ* prevZ, int i, CorpusData* dt, vec2D
 }
 
 
-void OnlineGibbsMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset) {
+void OnlineGibbsMedLDA::infer_Phi_Eta(ptr<SampleZ> prevZ, ptr<CorpusData> dt, bool reset) {
   int batchIdx = 0, batchSize = dt->D;
 
   /* setting basic parameters for convenience. */
@@ -255,7 +257,7 @@ void OnlineGibbsMedLDA::infer_Phi_Eta(SampleZ* prevZ, CorpusData* dt, bool reset
   for(int k = 0; k < K; k++) {
     for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
       int d = dd%dt->D;
-      stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d]*prevZ->Cdk[d][k]/(double)dt->W[d];
+      stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d][category[0]]*prevZ->Cdk[d][k]/(double)dt->W[d];
     }
   }
   for(int k1 = 0; k1 < K; k1++) {
@@ -332,20 +334,26 @@ void OnlineGibbsMedLDA::normalize_Phi_Eta(int N, bool remove) {
 }
   
 
-double OnlineGibbsMedLDA::train(vec2D<int> batch, vec<int> label) {
+double OnlineGibbsMedLDA::train(const vec2D<int>& batch, const vec<int>& labels) {
+  vec2D<int> multi_labels;
+  for(auto label: labels) {
+    vector<int> this_label;
+    this_label.push_back(label);
+    multi_labels.push_back(this_label);
+  }
+  return this->train(batch, multi_labels);
+}
+
+
+double OnlineGibbsMedLDA::train(const vec2D<int>& batch, const vec2D<int>& labels) {
   clock_t time_start = clock();
   clock_t time_end;
 
   /* create data samples from raw batch */
-  int data_size = batch.size();
-  DataSample** data_sample = new DataSample*[data_size];
-  for(int di = 0; di < data_size; di++) {
-    data_sample[di] = new DataSample(batch[di], label[di]);
-  }
-  CorpusData* data = new CorpusData(data_sample, data_size, this->category);
+  ptr<CorpusData> data = make_shared<CorpusData>(batch, labels, this->num_category);
 
   /* initialize the samples of latent variables */
-  SampleZ* iZ = new SampleZ(data->D, data->W);
+  ptr<SampleZ> iZ = make_shared<SampleZ>(data->D, data->W);
   iZ->Cdk = new double*[data->D];
   for(int i = 0; i < data->D; i++) {
     iZ->Cdk[i] = new double[K];
@@ -360,7 +368,7 @@ double OnlineGibbsMedLDA::train(vec2D<int> batch, vec<int> label) {
   }
   updateLambda(iZ, data);
 
-  /* inference via streaming MedLDA */
+  /* training via streaming MedLDA */
   for(int si = 0; si < I; si++) {
     for(int sj = 0; sj < J; sj++) {
       updateZ(iZ, data);
@@ -370,31 +378,20 @@ double OnlineGibbsMedLDA::train(vec2D<int> batch, vec<int> label) {
     }
     normalize_Phi_Eta(J-J_burnin, si>0);
   }
-  /* cleaning */
-  for(int di = 0; di < data_size; di++) {
-    delete data_sample[di];
-  }
-  delete[] data_sample;
-  delete data;
-  delete iZ;
 
   time_end = clock();
   train_time += (double)(time_end-time_start)/CLOCKS_PER_SEC;
   return train_time;
 }
 
-vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sample, int category) {
+vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sample) {
   /* pre-clearning */
   Zbar_test.clear();
 
   /* parse data */
-  int data_size = batch.size();
-  vector<DataSample*> data_sample(data_size);
-  for(int di = 0; di < data_size; di++) {
-    data_sample[di] = new DataSample(batch[di]);
-  }
-  CorpusData* testData = new CorpusData(&data_sample[0], data_size, this->category);
-  SampleZ* iZ_test = new SampleZ(testData->D, testData->W);
+  ptr<CorpusData> testData = make_shared<CorpusData>(batch, this->num_category);
+  size_t data_size = testData->D;
+  ptr<SampleZ> iZ_test = make_shared<SampleZ>(testData->D, testData->W);
 
   /* initialization for inference */
   int testBurninN, max_gibbs_iter;
@@ -450,17 +447,14 @@ vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sampl
     double discriFunc = 0;
     for(int k = 0; k < K; k++)
       discriFunc += eta_mean[k]*Zbar_test[i][k];
-    testData->my[i] = discriFunc;
-    if(discriFunc >= 0) testData->py[i] = 1;
-    else testData->py[i] = -1;
+    testData->my[i][category[0]] = discriFunc;
+    if(discriFunc >= 0) testData->py[i][category[0]] = 1;
+    else testData->py[i][category[0]] = -1;
 
-    my.push_back(testData->my[i]);
+    my.push_back(testData->my[i][category[0]]);
   }
 
   /* cleaning */
-  for(int di = 0; di < data_size; di++) 
-    delete data_sample[di];
-  delete testData;
   return my;
 }
 

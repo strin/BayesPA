@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include "utils.h"
+#include "stl.h"
 
 class Sample {
 public:
@@ -30,11 +31,11 @@ public:
 class SampleZ {
 public:
 	// construction & destruction.
-	SampleZ( int D, int* W);
+	SampleZ( int D, stl::vec<int> W);
 	~SampleZ();
 	// parameters.
 	int D;
-	int* W;
+        stl::vec<int> W;
 	// content.
 	int** Z; // samples of hidden units.
 	double** Cdk;

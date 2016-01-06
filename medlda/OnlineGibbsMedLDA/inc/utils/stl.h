@@ -29,11 +29,20 @@ public:
     return (*this->data)[index];
   }
 
+  const T& operator[](size_t index) const {
+    return (*this->data)[index];
+  }
+
+  vec<T>& operator=(const vector<T>& v) {
+    *this->data = v;
+    return *this;
+  }
+
   std::vector<T>& operator*() {
     return *this->data;
   }
 
-  void resize(size_t size, T val) {
+  void resize(size_t size, T val = 0) {
     this->data->resize(size, val);
   }
 
@@ -86,12 +95,20 @@ public:
   vec2D(size_t size, const std::vector<T>& val) {
     this->data = std::make_shared<std::vector<std::vector<T> > >(size, val);
   }
+  
+  void resize(size_t size) {
+    this->data->resize(size);
+  }
 
-  void resize(size_t size, const std::vector<T> val) {
+  void resize(size_t size, const std::vector<T>& val) {
     this->data->resize(size, val);
   }
 
   std::vector<T>& operator[](size_t index) {
+    return (*this->data)[index];
+  }
+
+  const std::vector<T>& operator[](size_t index) const {
     return (*this->data)[index];
   }
 
@@ -109,6 +126,10 @@ public:
 
   void push_back(const std::vector<T>& val) {
     this->data->push_back(val);
+  }
+
+  void push_back(const vec<T>& val) {
+    this->data->push_back(*val.data);
   }
   
   typedef typename std::vector<std::vector<T> >::iterator IteratorType;

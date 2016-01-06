@@ -11,154 +11,119 @@
 
 #include <iostream>
 #include <string>
+#include <functional>
+#include <cassert>
 #include <dirent.h>
+
 #include "debug.h"
 #include "utils.h"
 #include "stl.h"
 
-#include "Document.h"
 
 using namespace std;
 using namespace stl;
 
-typedef struct {
-	map<string, int>* dic;
-	map<int, string>* inv_dic;
-}Dictionary;
 
 class DataSample {
+
 public:
-	DataSample() {}
-	/* create data sample for multi-class classification */
-	DataSample(const vector<int>& ex, const int& label) {
-		this->W = ex.size();
-		if(this->W == 0) return;
-		this->words = new int[this->W];
-		for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
-		this->label = label;
-	}
-	/* create data sample for multi-class classification */
-	DataSample(const vector<int>& ex) {
-		this->W = ex.size();
-		if(this->W == 0) return;
-		this->words = new int[this->W];
-		for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
-		this->label = 0;
-	}
-	int* words;
-	int W;
-	int label;
-	vector<int> multi_label;
+
+  DataSample() {}
+
+  /* create data sample for multi-class classification */
+  DataSample(const vector<int>& ex, const int& label) {
+    this->W = ex.size();
+    if(this->W == 0) return;
+    this->words.resize(this->W);
+    for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
+    this->labels.push_back(label);
+  }
+
+  /* create data sample for multi-class classification */
+  DataSample(const vector<int>& ex, const vector<int>& labels) {
+    this->W = ex.size();
+    if(this->W == 0) return;
+    this->words.resize(this->W);
+    for(int wi = 0; wi < this->W; wi++) this->words[wi] = ex[wi];
+    this->labels = labels;
+  }
+
+  vec<int> words;  // the words in the document.
+  vec<int> labels, pred;  // the ground truth label and predicted label.
+  int W;       // number of words.
 };
 
+
+/* transform dataset into form that MedLDA processes.
+ * for num_cateory, a y-vector is created. fro exampke, 
+ * if cat = [3,4] and num_category 5, then y =[-1,-1,-1,1,1].
+ */
 class CorpusData {
 public:
-	CorpusData() {}
-	/* make a copy of data sample, relabel the labels in data according to <category> 
-	 * if y == cat, then doc is labelled as 1; 
-	 * else, doc is labelled as 0.
-	 */
-	CorpusData(DataSample** data, int data_size, int category, bool multi_label = false) {
-		this->D = data_size;
-		this->W	= new int[this->D];
-		this->data = new int*[this->D];
-		this->y	= new int[this->D];
-		this->py = new int[this->D];
-		this->my = new double[this->D];
+  CorpusData() {}
+  
+  CorpusData(const vec2D<int>& docs, size_t num_category) {
+    const size_t data_size = docs.size();
+    vec<shared_ptr<DataSample> > data(data_size);
 
-		this->train_pos = this->train_neg = 0;
+    for(int di = 0; di < data_size; di++) {
+      vector<int> label;
+      data[di] = make_shared<DataSample>(docs[di], label);
+    }
+    
+    this->init(data, num_category);
+  }
 
-		for(int i = 0; i < this->D; i++) {
-			this->W[i] = data[i]->W;
-			if(category == -1)
-				this->y[i] = data[i]->label;
-			else{
-				if(multi_label) {
-					this->y[i] = -1;
-					for(int j = 0; j < data[i]->multi_label.size(); j++) {
-						if(category == data[i]->multi_label[j])
-							this->y[i] = 1;
-					}
-				}else
-					this->y[i] = data[i]->label == category ? 1 : -1;
-			}
-			this->train_neg += (1-this->y[i])/2;
-			this->train_pos += (1+this->y[i])/2;
-			this->py[i] = 0;
-			this->data[i] = new int[this->W[i]];
-			for(int w = 0; w < this->W[i]; w++) this->data[i][w] = data[i]->words[w];
-		}
-	}
+  CorpusData(const vec2D<int>& docs, const vec2D<int>& labels, size_t num_category) {
+    const size_t data_size = docs.size();
+    vec<shared_ptr<DataSample> > data(data_size);
 
-	/* destructors */
-	~CorpusData() {
-		delete[] this->W;
-		delete[] this->y;
-		delete[] this->py;
-		delete[] this->my;
-		for(int i = 0; i < this->D; i++) {
-			delete[] this->data[i];
-		}
-		delete[] this->data;
-	}
+    for(int di = 0; di < data_size; di++) {
+      data[di] = make_shared<DataSample>(docs[di], labels[di]);
+    }
+    
+    this->init(data, num_category);
+  }
 
-	int D;
-	int** data;
-	int* y, *py; // label and predicted label.
-	double* my; // confidence level (margin).
-	int *W;
 
-	int train_pos, train_neg;
-};
+  CorpusData(const vec<shared_ptr<DataSample> >& data, size_t num_category) {
+    this->init(data, num_category);
+  }
 
-typedef struct {
-	int D;
-	int** data;
-	int** y, **py;
-	double** my;
-	int* W;
-}CorpusDataMt;
 
-class Corpus {
-public:
-	Corpus();
-	~Corpus();
-	
-	// Corpus IO.
-	bool loadRawCorpus( string directory);
-	bool processRawCorpus(); // process the raw corpus.
-	bool writeBinaryCorpus( string file_path);
-	bool loadBinaryCorpus( string file_path);
-	bool loadDataGML( string train_file_path,
-								string test_file_path); // load .gml data file.
-	bool loadDataGML_MT(string train_file_path, string test_file_path, bool single_label = false);
-	// Dictionary IO.
-	map<string, int>* genDictionary();
-	bool saveDictionary( string file_path, map<string, int>* dic);
-	Dictionary* loadDictionary( string file_path, bool assign_label = false);
-	
-	// Basic Learning Aux.
-	// Generate Training Data (do not copy on right).
-	bool genTrainingDataRandom( double percent); // generate training/test data at random.
-	bool genTrainingData( int groupid); // generate training/test data from docType.
-	bool genBinaryTrainingData( string class1, string class2); // generate binary training/test data.
-	bool genBinaryTrainingData( string class1);
-	bool genMulticlassTrainingData();
-	bool loadDocumentType( char* filename);
-	bool saveDocumentType( char* filename);
-	CorpusData* exportTestData( int category = -1); // export test data in the format of CorpusData*.
-	
-	// Basic Data.
-	Document*** documents;
-	int newsgroupN; // total news groups.
-	int* D, T; // D: document count for each group, T: total word count.
-	Dictionary* dic;
-	
-	// Training Data.
-	bool** documentType; // is it a training document.
-	DataSample **trainData, **testData;
-	bool multi_label;
-	int trainDataSize, testDataSize;
+  void init(const vec<shared_ptr<DataSample> >& data, size_t num_category) {
+    // (TODO) replace the manual memory management with shared_ptr.
+    this->D = data.size();
+    this->W.resize(this->D);
+    this->data.resize(this->D);
+    this->y.resize(this->D);
+    this->py.resize(this->D);
+    this->my.resize(this->D);
+
+    for(int i = 0; i < this->D; i++) {
+      auto data_sample = data[i];
+      this->W[i] = data_sample->W;
+      this->y[i].resize(num_category, -1);
+
+      for(auto label: data_sample->labels) {
+        assert(label < num_category && label >= 0);
+        this->y[i][label] = 1;
+      }
+
+      this->py[i].resize(num_category, -1);
+      this->my[i].resize(num_category, 0);
+      
+      this->data[i].resize(this->W[i]);
+      for(int w = 0; w < this->W[i]; w++) this->data[i][w] = data_sample->words[w];
+    }
+
+  }
+
+  int D;
+  vec<int> W;       // length of each document.
+  vec2D<int> data;  // document words.
+  vec2D<int> y, py; // document y-vectors and predicted y-vectors.
+  vec2D<double> my; // confidence level (margin).
 };
 
 #endif /* defined(__OnlineTopic__Corpus__) */

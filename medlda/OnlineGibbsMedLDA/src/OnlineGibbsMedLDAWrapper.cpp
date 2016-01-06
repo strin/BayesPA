@@ -1,4 +1,5 @@
 #include "OnlineGibbsMedLDAWrapper.h"
+#include "stdio.h"
 
 using namespace pyutils;
 using namespace std;
@@ -9,13 +10,14 @@ paMedLDAgibbsWrapper::paMedLDAgibbsWrapper(boost::python::dict config)
   this->_numWord = bp::extract<int>(config["#word"]);
 
   pamedlda.resize(_numLabel);
-
+  
   for(int ci = 0; ci < _numLabel; ci++) {
-    pamedlda[ci] = shared_ptr<OnlineGibbsMedLDA>(new OnlineGibbsMedLDA(ci));
+    pamedlda[ci] = shared_ptr<OnlineGibbsMedLDA>(new OnlineGibbsMedLDA({ci}));
 
     /* hyper-parameters */
     pamedlda[ci]->K = bp::extract<int>(config["#topic"]);
     pamedlda[ci]->T = _numWord;
+    pamedlda[ci]->num_category = _numLabel;
     pamedlda[ci]->init();
 
     /* optional parameters */
