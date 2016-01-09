@@ -33,7 +33,6 @@ public:
   void draw_Z_test(ptr<SampleZ> prevZ, int i, stl::ptr<CorpusData> dt, vec2D<double>& Ckt, vec<double>& Ckt_sum);
 
   void computeZbar(stl::ptr<CorpusData> data, ptr<SampleZ> Z, int di);
-  double computeDiscriFunc(stl::ptr<CorpusData> dt, int di, Sample* sample, ptr<SampleZ> Z, double norm);
 
   void updateLambda( ptr<SampleZ> prevZ, stl::ptr<CorpusData> dt);
   

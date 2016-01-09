@@ -16,18 +16,6 @@
 #include "utils.h"
 #include "stl.h"
 
-class Sample {
-public:
-	// construction & destruction.
-	Sample( int K, int T);
-	~Sample();
-	// parameters.
-	int K, T;
-	// content.
-	double** phi; // dictionary.
-	double* eta;
-};
-
 class SampleZ {
 public:
 	// construction & destruction.

@@ -8,26 +8,6 @@
 
 #include "Sample.h"
 
-Sample::Sample( int K, int T) {
-	phi = new double*[K];
-	eta = new double[K];
-	for( int i = 0; i < K; i++) phi[i] = new double[T];
-	this->K = K;
-	this->T = T;
-}
-
-Sample::~Sample() {
-	if( phi != 0) {
-		for( int i = 0; i < K; i++)
-			if( phi[i] != 0) delete[] phi[i];
-		delete[] phi;
-		phi = 0;
-	}
-	if( eta != 0) {
-		delete[] eta;
-		eta = 0;
-	}
-}
 
 SampleZ::SampleZ(int D, stl::vec<int> W) {
 	Z = new int*[D];

@@ -179,17 +179,6 @@ void OnlineGibbsMedLDA::computeZbar(ptr<CorpusData> data, ptr<SampleZ> Z, int di
   for(int k = 0; k < K; k++) Z->Zbar[di][k] /= data->W[di]; // normalize.
 }
 
-double OnlineGibbsMedLDA::computeDiscriFunc(ptr<CorpusData> dt, int di, Sample *sample, ptr<SampleZ> Z, double norm) {
-  double discriFunc = 0;
-  for(int k = 0; k < K; k++) {
-    discriFunc += sample->eta[k]*Z->Cdk[di][k];
-  }
-  if(norm == 0)
-    return discriFunc/(double)dt->W[di];
-  else
-    return discriFunc/(double)norm;
-}
-
 void OnlineGibbsMedLDA::draw_Z_test(ptr<SampleZ> prevZ, int i, ptr<CorpusData> dt, vec2D<double>& Ckt, vec<double>& Ckt_sum) {
   // setting basic parameters for convenience.
   auto W = dt->W;
