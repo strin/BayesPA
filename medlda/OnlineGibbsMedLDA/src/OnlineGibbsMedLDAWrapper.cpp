@@ -148,53 +148,11 @@ bp::list paMedLDAgibbsWrapper::topicDistOfInference(bp::object category_no) cons
   return mat;
 }
 
-inline bp::object paMedLDAgibbsWrapper::numWord() const {
+bp::object paMedLDAgibbsWrapper::numWord() const {
   return bp::object(_numWord);
 }
 
-inline bp::object paMedLDAgibbsWrapper::numLabel() const {
+bp::object paMedLDAgibbsWrapper::numLabel() const {
   return bp::object(_numLabel);
 }
-
-
-////////////////////////////////////////////////////////
-//////////// private methods /////////////////////////
-pair<vec2D<int>, vec<int> > 
-paMedLDAgibbsWrapper::filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C) {
-  auto ret = vec2D<int>();
-  vec<int> new_label;
-  for(size_t ni = 0; ni < bp::len(batch); ni++) {
-    bp::list ex = bp::extract<bp::list>(batch[ni]);
-    size_t y = (size_t)bp::extract<int>(label[ni]);
-    if(y >= C) continue;
-    std::vector<int> row;
-    for(size_t wi = 0; wi < bp::len(ex); wi++) {
-      size_t token = (size_t)bp::extract<int>(ex[wi]);
-      if(token < T) {
-        row.push_back(token);
-      }
-    }
-    ret.push_back(row);
-    new_label.push_back(y);
-  }
-  return make_pair(ret, new_label);
-}
-
-BOOST_PYTHON_MODULE(libbayespagibbs)
-{
-  using namespace boost::python;
-  
-  class_<paMedLDAgibbsWrapper>("paMedLDAgibbs",init<boost::python::dict>())
-    .def("train", &paMedLDAgibbsWrapper::train)
-    .def("infer", &paMedLDAgibbsWrapper::infer)
-    .def("timeElapsed", &paMedLDAgibbsWrapper::timeElapsed)
-    .def("testAcc", &paMedLDAgibbsWrapper::testAcc)
-    .def("topicMatrix", &paMedLDAgibbsWrapper::topicMatrix)
-    .def("topicDistOfInference", &paMedLDAgibbsWrapper::topicDistOfInference)
-    .def("topWords", &paMedLDAgibbsWrapper::topWords)
-    .def("numWord", &paMedLDAgibbsWrapper::numWord)
-    .def("numLabel", &paMedLDAgibbsWrapper::numLabel)
-    ;
-};
-
 

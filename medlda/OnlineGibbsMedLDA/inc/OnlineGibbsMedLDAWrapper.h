@@ -49,13 +49,29 @@ public:
 	double m_test_acc;
 
 private:
-  /* filter out tokens that are not in range [0, T-1], and documents whose label not in [0, C-1]. */
-  std::pair<pyutils::vec2D<int>, pyutils::vec<int> >
-  filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C);
-
   /* return number of words in the vocabulary */
   size_t _numWord;
   size_t _numLabel;
+
+  static pair<vec2D<int>, vec<int> > filterWordAndLabel(bp::list batch, bp::list label, size_t T, size_t C) {
+    auto ret = vec2D<int>();
+    vec<int> new_label;
+    for(size_t ni = 0; ni < bp::len(batch); ni++) {
+      bp::list ex = bp::extract<bp::list>(batch[ni]);
+      size_t y = (size_t)bp::extract<int>(label[ni]);
+      if(y >= C) continue;
+      std::vector<int> row;
+      for(size_t wi = 0; wi < bp::len(ex); wi++) {
+        size_t token = (size_t)bp::extract<int>(ex[wi]);
+        if(token < T) {
+          row.push_back(token);
+        }
+      }
+      ret.push_back(row);
+      new_label.push_back(y);
+    }
+    return make_pair(ret, new_label);
+  }
 };
 
 

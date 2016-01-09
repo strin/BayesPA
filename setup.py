@@ -7,7 +7,7 @@ pamedlda = Extension('libbayespagibbs',
                     include_dirs = [dir_medlda + 'inc', dir_medlda + 'inc/utils'],
                     library_dirs = ['/opt/local/lib/'],
                     libraries = ['boost_python-mt'],
-                    extra_compile_args=['-std=c++11', '-w'], 
+                    extra_compile_args=['-std=c++11', '-w'],
                     sources = [dir_medlda + name for name in [
                                         "src/utils/ap.cpp",
                                         "src/utils/cholesky.cpp",
@@ -18,9 +18,11 @@ pamedlda = Extension('libbayespagibbs',
                                         "src/utils/objcokus.cpp",
                                         "src/utils/spdinverse.cpp",
                                         "src/utils/Document.cpp",
-                                        "src/utils/Sample.cpp", 
+                                        "src/utils/Sample.cpp",
                                         "src/OnlineGibbsMedLDA.cpp",
-                                        "src/OnlineGibbsMedLDAWrapper.cpp"
+                                        "src/OnlineGibbsMedLDAWrapper.cpp",
+                                        "src/OnlineGibbsMedLDAmtWrapper.cpp",
+                                        "src/PythonWrapper.cpp"
                                   ]])
 
 setup(name='medlda',
