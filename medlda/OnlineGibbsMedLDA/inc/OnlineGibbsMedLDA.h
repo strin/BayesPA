@@ -46,7 +46,7 @@ public:
   double train(const stl::vec2D<int>& batch, const stl::vec<int>& label);
   // deal with multiple labels.
   double train(const stl::vec2D<int>& batch, const stl::vec2D<int>& label);
-  vector<double> inference(vec2D<int> batch, int num_test_sample = -1);
+  vec2D<double> inference(vec2D<int> batch, int num_test_sample = -1);
   
   /* hyper parameters */
   int K;	    // number of topics.
@@ -67,14 +67,12 @@ public:
   /* stats */
   stl::vec2D<double> gamma, prev_gamma;			  // sufficient statistics.
   stl::vec<double> gammasum;				  // sums of rows in gamma.
-  stl::vec2D<double> eta_icov, eta_cov, prev_eta_icov;    // weight covariance matrix.
-  stl::vec<double> eta_pmean, eta_mean, prev_eta_pmean;   // mean of eta without transformation.
-  stl::vec2D<double> stat_phi, stat_icov;                 // stat used in global update.
-  stl::vec<double> stat_pmean;                            // stat used in global update.
-
+  stl::vec2D<double> stat_phi;                 // stat used in global update.
   stl::vec<int> stat_phi_list_k, stat_phi_list_t;		  // aux stats for sparse updates.
   stl::vec<int> prev_gamma_list_k, prev_gamma_list_t;         // aux stats for sparse updates.
   
+  vector<ptr<SampleWeight> > weight;
+
   /* results */
   double train_time;                      // training time spent.
   vector<vector<double> > Zbar_test;      // emprirical topic distribution of last inferred corpus.

@@ -20,8 +20,8 @@ OnlineGibbsMedLDA::OnlineGibbsMedLDA(const vector<int>& category) {
   /* parameters by default */
   K                  = 5;	    
   T                  = 0;
-  num_category       = 2;
-  this->category = category;
+  this->category = category; // the categories to learn classifier for.
+  num_category       = 2; // can be different than category.size()
 
   I                  = 3;           
   J                  = 1;	    
@@ -45,25 +45,6 @@ void OnlineGibbsMedLDA::init() {
     prev_gamma[k].resize(T, 0);
   }
 
-  eta_icov = vec2D<double>(K);
-  eta_cov = vec2D<double>(K);
-  prev_eta_icov = vec2D<double>(K);
-  stat_icov = vec2D<double>(K);
-
-  for(int k = 0; k < K; k++) {
-    eta_icov[k].resize(K, 0);
-    eta_icov[k][k] = 1 / (v * v);
-    eta_cov[k].resize(K, 0);
-    eta_cov[k][k] = v * v;
-    prev_eta_icov[k].resize(K, 0);
-    stat_icov[k].resize(K, 0);
-  }
-
-  eta_pmean = vec<double>(K, 0);
-  eta_mean = vec<double>(K, 0);
-  stat_pmean = vec<double>(K, 0);
-  prev_eta_pmean = vec<double>(K, 0);
-
   stat_phi = vec2D<double>(K);
   for(int i = 0; i < K; i++) 
     stat_phi[i].resize(T, 0);
@@ -72,6 +53,11 @@ void OnlineGibbsMedLDA::init() {
   prev_gamma_list_t = vec<int>();
   stat_phi_list_k = vec<int>();
   stat_phi_list_t = vec<int>();
+
+  this->weight.resize(category.size());
+  for(size_t ci = 0; ci < category.size(); ci++) {
+    this->weight[ci] = make_shared<SampleWeight>(K, v);
+  }
 
   train_time = 0;
 
@@ -88,63 +74,84 @@ OnlineGibbsMedLDA::~OnlineGibbsMedLDA() {
 }
 
 void OnlineGibbsMedLDA::updateZ(ptr<SampleZ> nextZ, ptr<CorpusData> dt) {
-  double weights[K];                      // weights for importance sampling.
-  double A1, A2[K], A3, B1, B2;          // replacements for fast computation.
+  double weights[K], log_weights[K];          // weights for importance sampling.
+  double A1[category.size()], A2[category.size()][K], 
+         A3[category.size()], B1[category.size()], B2[category.size()];      // replacements for fast computation.
   int word, N;
-  double sel, cul;
+  double sel;
   int seli;
   int batchIdx = 0, batchSize = dt->D;
   for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
     int i = ii%dt->D;
     N = dt->W[i];
     double invN = 1.0/N, invNx2 = invN*invN;
-    for(int k1 = 0; k1 < K; k1++) {
-      A2[k1] = 0;
-      for(int k2 = 0; k2 < K; k2++) {
-        A2[k1] += 2*eta_cov[k1][k2]*nextZ->Cdk[i][k2];
+
+    for(size_t ci = 0; ci < category.size(); ci++) {
+      for(int k1 = 0; k1 < K; k1++) {
+        A2[ci][k1] = 0;
+        for(int k2 = 0; k2 < K; k2++) {
+          A2[ci][k1] += 2*weight[ci]->eta_cov[k1][k2]*nextZ->Cdk[i][k2];
+        }
       }
     }
+
     for(int j = 0; j < N; j++) {
       word = dt->data[i][j];
       if(word >= T) {
         debug("error: word %d out of range [0, %d).\n", word, T);
       }
       nextZ->Cdk[i][nextZ->Z[i][j]]--; // exclude Zij.
-      A1 = 0;
-      for(int k = 0; k < K; k++) {
-        A1 += 2*eta_mean[k]*nextZ->Cdk[i][k];
-        A2[k] -= 2*eta_cov[k][nextZ->Z[i][j]];
-      }
-      B1 = c*dt->y[i][category[0]]*(1+c*l*nextZ->invlambda[i])*invN;
-      B2 = c*c*nextZ->invlambda[i]*0.5*invNx2;
-      int flagZ = -1, flag0 = -1; // flag for abnomality.
-      for(int k = 0; k < K; k++) {
-        A3 = eta_mean[k]*eta_mean[k]+eta_cov[k][k];
-        if(k == 0) cul = 0;
-        else cul = weights[k-1];
-        weights[k] = cul+(nextZ->Cdk[i][k]+alpha0)
-              /* strategy 1 variational optimal distribution */
-              *exp(digamma(beta0+gamma[k][word])-digamma(beta0*T+gammasum[k]))
-              /* strategy 2 approximation that does not require digamma() */
-              // *(beta0+gamma[k][word])/(beta0*T+gammasum[k])
-              *exp(B1*eta_mean[k]-B2*(A3+(A1*eta_mean[k]+A2[k])));
-        if(std::isnan(weights[k])) {
-          debug("error: Z weights nan.\n");
-          flagZ = k;
+
+      for(size_t ci = 0; ci < category.size(); ci++) {
+        A1[ci] = 0;
+        for(int k = 0; k < K; k++) {
+          A1[ci] += 2*weight[ci]->eta_mean[k]*nextZ->Cdk[i][k];
+          A2[ci][k] -= 2*weight[ci]->eta_cov[k][nextZ->Z[i][j]];
         }
-        if(std::isinf(weights[k])) flagZ = k; // too discriminative, directly set val.
-        if(weights[k] > 0) flag0 = 1;
+        B1[ci] = c*dt->y[i][category[ci]]*(1+c*l*nextZ->invlambda[ci][i])*invN;
+        B2[ci] = c*c*nextZ->invlambda[ci][i]*0.5*invNx2;
       }
-      if(flagZ >= 0) nextZ->Z[i][j] = flagZ;
-      else if(flag0 == -1) nextZ->Z[i][j] = cokus.randomMT()%K;
-      else {
-        sel = weights[K-1]*cokus.random01();
-        for(seli = 0; weights[seli] < sel; seli++);
-        nextZ->Z[i][j] = seli;
-      }
+
+      double max_log_weight =  -1e10;
+
       for(int k = 0; k < K; k++) {
-        A2[k] += 2*eta_cov[k][nextZ->Z[i][j]];
+        for(size_t ci = 0; ci < category.size(); ci++) {
+          A3[ci] = weight[ci]->eta_mean[k]*weight[ci]->eta_mean[k]+weight[ci]->eta_cov[k][k];
+        }
+
+        log_weights[k] = log((nextZ->Cdk[i][k]+alpha0) 
+                /* strategy 1 variational optimal distribution */
+                // *exp(digamma(beta0+gamma[k][word])-digamma(beta0*T+gammasum[k]))
+                /* strategy 2 approximation that does not require digamma() */
+                *(beta0+gamma[k][word])/(beta0*T+gammasum[k])
+            );
+
+        for(size_t ci = 0; ci < category.size(); ci++) {
+          log_weights[k] += B1[ci] * weight[ci]->eta_mean[k] 
+            - B2[ci] * (A3[ci] + (A1[ci] * weight[ci]->eta_mean[k]
+                  + A2[ci][k]));
+        }
+
+        if(log_weights[k] > max_log_weight) max_log_weight = log_weights[k];
       }
+
+      double cum = 0;
+      for(int k = 0; k < K; k++) {
+        log_weights[k] -= max_log_weight;
+        weights[k] = cum + exp(log_weights[k]);
+        cum = weights[k];
+      }
+      
+      sel = cum * cokus.random01();
+      for(seli = 0; weights[seli] < sel; seli++);
+      nextZ->Z[i][j] = seli;
+    
+      for(size_t ci = 0; ci < category.size(); ci++) {
+        for(int k = 0; k < K; k++) {
+          A2[ci][k] += 2 * weight[ci]->eta_cov[k][nextZ->Z[i][j]];
+        }
+      }
+
       nextZ->Cdk[i][nextZ->Z[i][j]]++; // restore Cdk, Ckt.
     }
   }
@@ -152,20 +159,22 @@ void OnlineGibbsMedLDA::updateZ(ptr<SampleZ> nextZ, ptr<CorpusData> dt) {
 
 void OnlineGibbsMedLDA::updateLambda(ptr<SampleZ> prevZ, ptr<CorpusData> dt) {
   int batchIdx = 0, batchSize = dt->D;
-  for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
-    int i = ii%dt->D;
-    double discriFunc = 0;
-    for(int k = 0; k < K; k++)
-      discriFunc += eta_mean[k]*prevZ->Cdk[i][k]/(double)dt->W[i];
-    double zetad = l-dt->y[i][category[0]]*discriFunc;
-    double bilinear = 0;
-    for(int k1 = 0; k1 < K; k1++) {
-      for(int k2 = 0; k2 < K; k2++) {
-        bilinear += prevZ->Cdk[i][k1]*prevZ->Cdk[i][k2]*eta_cov[k1][k2]/(double)dt->W[i]/(double)dt->W[i];
+  for(size_t ci = 0; ci < category.size(); ci++) {
+    for(int ii = batchIdx; ii < batchIdx+batchSize; ii++) {
+      int i = ii%dt->D;
+      double discriFunc = 0;
+      for(int k = 0; k < K; k++)
+        discriFunc += weight[ci]->eta_mean[k]*prevZ->Cdk[i][k]/(double)dt->W[i];
+      double zetad = l-dt->y[i][category[ci]]*discriFunc;
+      double bilinear = 0;
+      for(int k1 = 0; k1 < K; k1++) {
+        for(int k2 = 0; k2 < K; k2++) {
+          bilinear += prevZ->Cdk[i][k1]*prevZ->Cdk[i][k2]*weight[ci]->eta_cov[k1][k2]/(double)dt->W[i]/(double)dt->W[i];
+        }
       }
+      invgSampler->reset(1/c/sqrt(zetad*zetad+bilinear), 1);
+      prevZ->invlambda[ci][i] = invgSampler->sample();
     }
-    invgSampler->reset(1/c/sqrt(zetad*zetad+bilinear), 1);
-    prevZ->invlambda[i] = invgSampler->sample();
   }
 }
 
@@ -233,9 +242,14 @@ void OnlineGibbsMedLDA::infer_Phi_Eta(ptr<SampleZ> prevZ, ptr<CorpusData> dt, bo
 
   /* setting basic parameters for convenience. */
   if(reset) {
-    memset(&stat_pmean[0], 0, sizeof(double)*K);
+    for(size_t ci = 0; ci < category.size(); ci++) {
+      memset(&weight[ci]->stat_pmean[0], 0, sizeof(double)*K);
+      for(int k1 = 0; k1 < K; k1++) {
+        memset(&weight[ci]->stat_icov[k1][0], 0, sizeof(double)*K);
+      }
+    }
+
     for(int k1 = 0; k1 < K; k1++) {
-      memset(&stat_icov[k1][0], 0, sizeof(double)*K);
       memset(&stat_phi[k1][0], 0, sizeof(double)*T);
     }
     stat_phi_list_k.clear();
@@ -243,17 +257,19 @@ void OnlineGibbsMedLDA::infer_Phi_Eta(ptr<SampleZ> prevZ, ptr<CorpusData> dt, bo
   }
 
   /* update eta, which is gaussian distribution. */
-  for(int k = 0; k < K; k++) {
-    for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
-      int d = dd%dt->D;
-      stat_pmean[k] += c*(1+c*l*prevZ->invlambda[d])*dt->y[d][category[0]]*prevZ->Cdk[d][k]/(double)dt->W[d];
-    }
-  }
-  for(int k1 = 0; k1 < K; k1++) {
-    for(int k2 = 0; k2 < K; k2++) {
+  for(size_t ci = 0; ci < category.size(); ci++) {
+    for(int k = 0; k < K; k++) {
       for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
         int d = dd%dt->D;
-        stat_icov[k1][k2] += c*c*prevZ->Cdk[d][k1]*prevZ->Cdk[d][k2]*prevZ->invlambda[d]/(double)dt->W[d]/(double)dt->W[d];
+        weight[ci]->stat_pmean[k] += c*(1+c*l*prevZ->invlambda[ci][d])*dt->y[d][category[ci]]*prevZ->Cdk[d][k]/(double)dt->W[d];
+      }
+    }
+    for(int k1 = 0; k1 < K; k1++) {
+      for(int k2 = 0; k2 < K; k2++) {
+        for(int dd = batchIdx; dd < batchIdx+batchSize; dd++) {
+          int d = dd%dt->D;
+          weight[ci]->stat_icov[k1][k2] += c*c*prevZ->Cdk[d][k1]*prevZ->Cdk[d][k2]*prevZ->invlambda[ci][d]/(double)dt->W[d]/(double)dt->W[d];
+        }
       }
     }
   }
@@ -273,21 +289,20 @@ void OnlineGibbsMedLDA::infer_Phi_Eta(ptr<SampleZ> prevZ, ptr<CorpusData> dt, bo
 }
 
 void OnlineGibbsMedLDA::normalize_Phi_Eta(int N, bool remove) {
-  vec2D<double> eta_lowertriangle(K);
-  for(int i = 0; i < K; i++) 
-    eta_lowertriangle[i].resize(K, 0);
-
   /* normalize eta, which is gaussian distribution. */
-  for(int k = 0; k < K; k++) {
-    if(remove) eta_pmean[k] -= prev_eta_pmean[k];
-    prev_eta_pmean[k] = stat_pmean[k] * stepsize / (double)N;
-    eta_pmean[k] += prev_eta_pmean[k];
-  }
-  for(int k1 = 0; k1 < K; k1++) {
-    for(int k2 = 0; k2 < K; k2++) {
-      if(remove) eta_icov[k1][k2] -= prev_eta_icov[k1][k2];
-      prev_eta_icov[k1][k2] = stat_icov[k1][k2] * stepsize / (double)N;
-      eta_icov[k1][k2] += prev_eta_icov[k1][k2];
+  for(size_t ci = 0; ci < category.size(); ci++) {
+    for(int k = 0; k < K; k++) {
+      if(remove) weight[ci]->eta_pmean[k] -= weight[ci]->prev_eta_pmean[k];
+      weight[ci]->prev_eta_pmean[k] = weight[ci]->stat_pmean[k] * stepsize / (double)N;
+      weight[ci]->eta_pmean[k] += weight[ci]->prev_eta_pmean[k];
+    }
+
+    for(int k1 = 0; k1 < K; k1++) {
+      for(int k2 = 0; k2 < K; k2++) {
+        if(remove) weight[ci]->eta_icov[k1][k2] -= weight[ci]->prev_eta_icov[k1][k2];
+        weight[ci]->prev_eta_icov[k1][k2] = weight[ci]->stat_icov[k1][k2] * stepsize / (double)N;
+        weight[ci]->eta_icov[k1][k2] += weight[ci]->prev_eta_icov[k1][k2];
+      }
     }
   }
 
@@ -316,9 +331,15 @@ void OnlineGibbsMedLDA::normalize_Phi_Eta(int N, bool remove) {
   }
 
   /* compute aux information. */
-  inverse_cholydec(eta_icov, eta_cov, eta_lowertriangle, K);
-  for(int k = 0; k < K; k++) {
-    eta_mean[k] = dotprod(eta_cov[k], *eta_pmean, K);
+  for(size_t ci = 0; ci < category.size(); ci++) {
+    vec2D<double> eta_lowertriangle(K);
+    for(int i = 0; i < K; i++) 
+      eta_lowertriangle[i].resize(K, 0);
+
+    inverse_cholydec(weight[ci]->eta_icov, weight[ci]->eta_cov, eta_lowertriangle, K);
+    for(int k = 0; k < K; k++) {
+      weight[ci]->eta_mean[k] = dotprod(weight[ci]->eta_cov[k], *weight[ci]->eta_pmean, K);
+    }
   }
 }
   
@@ -342,7 +363,7 @@ double OnlineGibbsMedLDA::train(const vec2D<int>& batch, const vec2D<int>& label
   ptr<CorpusData> data = make_shared<CorpusData>(batch, labels, this->num_category);
 
   /* initialize the samples of latent variables */
-  ptr<SampleZ> iZ = make_shared<SampleZ>(data->D, data->W);
+  ptr<SampleZ> iZ = make_shared<SampleZ>(data->D, data->W, category.size());
   iZ->Cdk = new double*[data->D];
   for(int i = 0; i < data->D; i++) {
     iZ->Cdk[i] = new double[K];
@@ -373,14 +394,14 @@ double OnlineGibbsMedLDA::train(const vec2D<int>& batch, const vec2D<int>& label
   return train_time;
 }
 
-vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sample) {
+vec2D<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sample) {
   /* pre-clearning */
   Zbar_test.clear();
 
   /* parse data */
   ptr<CorpusData> testData = make_shared<CorpusData>(batch, this->num_category);
   size_t data_size = testData->D;
-  ptr<SampleZ> iZ_test = make_shared<SampleZ>(testData->D, testData->W);
+  ptr<SampleZ> iZ_test = make_shared<SampleZ>(testData->D, testData->W, category.size());
 
   /* initialization for inference */
   int testBurninN, max_gibbs_iter;
@@ -430,20 +451,25 @@ vector<double> OnlineGibbsMedLDA::inference(vec2D<int> batch, int num_test_sampl
   }
 
   /* evaluate inference accuracy.*/
-  int acc = 0;
-  vector<double> my;
-  for(int i = 0; i < testData->D; i++) {
-    double discriFunc = 0;
-    for(int k = 0; k < K; k++)
-      discriFunc += eta_mean[k]*Zbar_test[i][k];
-    testData->my[i][category[0]] = discriFunc;
-    if(discriFunc >= 0) testData->py[i][category[0]] = 1;
-    else testData->py[i][category[0]] = -1;
+  vec2D<double> my;
 
-    my.push_back(testData->my[i][category[0]]);
+  for(int i = 0; i < testData->D; i++) {
+    vector<double> resp;
+
+    for(size_t ci = 0; ci < category.size(); ci++) {
+      double discriFunc = 0;
+      for(int k = 0; k < K; k++)
+        discriFunc += weight[ci]->eta_mean[k]*Zbar_test[i][k];
+      testData->my[i][category[ci]] = discriFunc;
+      if(discriFunc >= 0) testData->py[i][category[ci]] = 1;
+      else testData->py[i][category[ci]] = -1;
+
+      resp.push_back(discriFunc);
+    }
+  
+    my.push_back(resp);
   }
 
-  /* cleaning */
   return my;
 }
 

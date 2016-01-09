@@ -65,9 +65,13 @@ bp::list paMedLDAgibbsWrapper::infer(bp::list batch, bp::list label, boost::pyth
   for(int ci = 0; ci < _numLabel; ci++) {
     threads[ci] = std::thread([&](int id)  {
       pamedlda[id]->point_estimate_for_test = point_estimate;
-      my[id] = pamedlda[id]->inference(docs, bp::extract<int>(num_test_sample));    
+      vec2D<double> my_mt = pamedlda[id]->inference(docs, bp::extract<int>(num_test_sample));
+      for(auto resp : my_mt) {
+        my[id].push_back(resp[0]);
+      }
     }, ci);
   }
+
   for(int ci = 0; ci < _numLabel; ci++) threads[ci].join();  
   double acc = 0;
   bp::list ret;

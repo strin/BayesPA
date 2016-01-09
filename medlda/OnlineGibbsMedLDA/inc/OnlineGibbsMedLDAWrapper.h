@@ -1,5 +1,5 @@
-#ifndef PY_PAMEDLDA_AVE_WRAPPER_H
-#define PY_PAMEDLDA_AVE_WRAPPER_H
+#ifndef PY_PAMEDLDA_GIBBS_WRAPPER_H
+#define PY_PAMEDLDA_GIBBS_WRAPPER_H
 
 #include <iostream>
 #include <vector>
