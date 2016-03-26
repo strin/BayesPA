@@ -11,8 +11,10 @@ datadir = os.environ['datadir']
 num_topic = int(os.environ['topic'])
 num_pass = int(os.environ['pass'])
 batchsize = int(os.environ['batchsize'])
+stepsize = float(os.environ['stepsize'])
 
-pamedlda = medlda.OnlineGibbsMedLDA(num_topic=num_topic, labels = 2, words = 61188)
+pamedlda = medlda.OnlineGibbsMedLDA(num_topic=num_topic, labels = 2,
+                                    words = 61188, stepsize=stepsize)
 
 for pi in range(num_pass):
     pamedlda.train_with_gml('%s/binary_train.gml' % datadir, batchsize)
@@ -24,11 +26,9 @@ if not os.path.exists(os.path.dirname(output)):
     os.mkdir(os.path.dirname(output))
 
 with open(output, 'a+') as f:
-    f.write('topic %(num_topic)d pass %(num_pass)d batchsize %(batchsize)d datetime %(datetime)s acc %(acc)f\n' %
-            dict(num_topic=num_topic, num_pass=num_pass, batchsize=batchsize, datetime=datetime.now().strftime('%D+%T'), acc=acc)
+    f.write('topic %(num_topic)d pass %(num_pass)d batchsize %(batchsize)d datetime %(datetime)s stepsize %(stepsize)f acc %(acc)f\n' %
+            dict(num_topic=num_topic, num_pass=num_pass, batchsize=batchsize,
+                 datetime=datetime.now().strftime('%D+%T'), acc=acc,
+                 stepsize=stepsize)
             )
-
-
-
-
 

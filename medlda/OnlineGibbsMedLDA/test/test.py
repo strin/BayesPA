@@ -28,7 +28,7 @@ class BinaryclassTest(unittest.TestCase):
   def setUp(me):
     m_K = 5
     me.batchsize = 64
-    config = {  "#topic"      :  m_K, 
+    config = {  "#topic"      :  m_K,
                 "dic_file"      :   "../../../data/dic.txt",
                 "epoch"        :   1}
     (me.docs, me.labels, T1) = read_gml('../../../../data/AtheismReligionMisc_Binary_train_nomalletstopwrd.gml')
@@ -62,7 +62,7 @@ class MulticlassTest(unittest.TestCase):
   def setUp(me):
     m_K = 20
     me.batchsize = 512
-    config = {  "#topic"      :  m_K, 
+    config = {  "#topic"      :  m_K,
                 "batchsize"      :  me.batchsize,
                 "train_file"    :  "../../../data/20ng_train.gml",
                 "test_file"      :  "../../../data/20ng_test.gml",
@@ -93,7 +93,7 @@ class MulticlassTest(unittest.TestCase):
     print 'test accuracy = ', me.pamedlda.testAcc()
     assert(me.pamedlda.testAcc() > 0.79)
 
-  
+
 if __name__ == '__main__':
   unittest.main()
 
