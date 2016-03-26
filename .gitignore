@@ -1,9 +1,10 @@
-*.so
-*.tags
-*.DS_Store
-*.cmake
-*.make
-CMakeCache*
+.DS_Store
+.ropeproject
 *.pyc
+tags
 *.swp
-
+*.sqlite
+upload/
+result
+build
+.ipynb_checkpoints
